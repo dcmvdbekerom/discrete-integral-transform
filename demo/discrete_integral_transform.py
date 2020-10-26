@@ -1,5 +1,10 @@
 import numpy as np
 
+C1_GG = ((6 * np.pi - 16) / (15 * np.pi - 32)) ** (1 / 1.50)
+C1_LG = ((6 * np.pi - 16) / 3 * (np.log(2) / (2 * np.pi)) ** 0.5) ** (1 / 2.25)
+C2_GG = (2 * np.log(2) / 15) ** (1 / 1.50)
+C2_LG = ((2 * np.log(2)) ** 2 / 15) ** (1 / 2.25)
+
 ## Prepare width-axes based on number of gridpoints and linewidth data:
 def init_w_axis(dx, log_wi):
     log_w_min = np.min(log_wi)
@@ -17,7 +22,7 @@ def get_indices(arr_i, axis):
 
 
 ## Calculate lineshape distribution matrix:
-def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
+def calc_matrix(v, dxG, dxL, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
     
     #  Initialize matrix:
     S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size))
@@ -29,34 +34,26 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
 
     # Calculate weights:
     if aw_kind == "optimized":
-        
-        dxG = (log_wG[-1] - log_wG[0])/(log_wG.size - 1)
-        dxL = (log_wL[-1] - log_wL[0])/(log_wL.size - 1)
-        dv     = (v[-1] - v[0])/(v.size - 1)
-        
-        C1_GG = ((6*np.pi-16)/(15*np.pi-32))**(2/3)
-        C1_LG = ((6*np.pi-16)/(3*(2*np.pi)**0.5))**(4/9)
-        C2_GG = (2/15)**(2/3)
-        C2_LG = (4/15)**(4/9)
 
-        alpha_i = np.exp(log_wLi - log_wGi)*(np.log(2))**0.5
-        wGi = np.exp(log_wGi)
+        dv = (v[-1] - v[0])/(v.size - 1)
+        dxvGi = dv / np.exp(log_wGi)
+        alpha_i = np.exp(log_wLi - log_wGi)
 
-        R_GGi = 1/(C1_GG + C2_GG*alpha_i**(4/3))**(3/2) - 2
-        R_GLi = 2*alpha_i**2
-        R_Gvi = -8*np.log(2)
+        R_Gv = 8 * np.log(2)
+        R_GG = 2 - 1 / (C1_GG + C2_GG * alpha_i ** (2 / 1.50)) ** 1.50
+        R_GL = -2 * np.log(2) * alpha_i ** 2
+
+        R_LL = 1
+        R_LG = 1 / (C1_LG * alpha_i ** (1 / 2.25) + C2_LG * alpha_i ** (4 / 2.25)) ** 2.25
         
-        R_LLi = -1
-        R_LGi = -1/(C1_LG*alpha_i**(4/9) + C2_LG*alpha_i**(16/9))**(9/4)
-
         avi = tvi
 
-        aGi = tGi + (R_GGi*tGi*(1-tGi)*dxG**2 +
-                     R_GLi*tLi*(1-tLi)*dxL**2 +
-                     R_Gvi*tvi*(1-tvi)*(dv/wGi)**2)/(2*dxG)
+        aGi = tGi + (R_Gv * tvi * (tvi - 1) * dxvGi**2 +
+                     R_GG * tGi * (tGi - 1) * dxG**2 +
+                     R_GL * tLi * (tLi - 1) * dxL**2 ) / (2 * dxG)
         
-        aLi = tLi + (R_LLi*tLi*(1-tLi)*dxL**2 +
-                     R_LGi*tGi*(1-tGi)*dxG**2)/(2*dxL)
+        aLi = tLi + (R_LG * tGi * (tGi - 1) * dxG**2 +
+                     R_LL * tLi * (tLi - 1) * dxL**2 ) / (2 * dxL)
 
 
     else:
@@ -109,7 +106,7 @@ def synthesize_spectrum(v, dxG, dxL, v0i, log_wGi, log_wLi, S0i, aw_kind = 'line
     log_wL = init_w_axis(dxL,log_wLi)
 
     # Calculate spectral matrix & apply transform:
-    S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind)
+    S_klm = calc_matrix(v, dxG, dxL, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind)
     I = apply_transform(v, log_wG, log_wL, S_klm)
         
     return I,S_klm
