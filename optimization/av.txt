@@ -1,0 +1,32 @@
+(
+ + 4*SG1v2*aGL*dxG*tv 
+ - 2*SG1v2*aGL*dxG 
+ - 4*SG1v2*dxG*tG*tv 
+ + 2*SG1v2*dxG*tG 
+ - 4*SG2v2*aGL*dxG**2*tG*tv 
+ + 2*SG2v2*aGL*dxG**2*tG 
+ + 2*SG2v2*aGL*dxG**2*tv 
+ -   SG2v2*aGL*dxG**2 
+ + 2*SG2v2*dxG**2*tG**2*tv 
+ -   SG2v2*dxG**2*tG**2 
+ + 4*SL1v2*aL*dxL*tv 
+ - 2*SL1v2*aL*dxL 
+ - 4*SL1v2*dxL*tL*tv 
+ + 2*SL1v2*dxL*tL 
+ - 4*SL2v2*aL*dxL**2*tL*tv 
+ + 2*SL2v2*aL*dxL**2*tL 
+ + 2*SL2v2*aL*dxL**2*tv 
+ -   SL2v2*aL*dxL**2 
+ + 2*SL2v2*dxL**2*tL**2*tv 
+ -   SL2v2*dxL**2*tL**2 
+ + 4*Sv1v1*tv 
+ + 2*Sv2v2*dxv**2*tv**3 
+ -   Sv2v2*dxv**2*tv**2
+ )
+ /
+ (
+ + 4*Sv1v1 
+ + 4*Sv2v2*dxv**2*tv**2 
+ - 4*Sv2v2*dxv**2*tv 
+ +   Sv2v2*dxv**2
+ )
