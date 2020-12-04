@@ -16,7 +16,7 @@ d_arr = np.array([-0.99] + list(np.arange(-0.95,1.0,0.025)) + [0.99])
 alpha_arr = (1+d_arr)/(1-d_arr)
 
 dxv = 0.05
-dxG = 0.1
+dxG = 0.14
 dxL = 0.2
 
 Erms_sim = []
@@ -101,8 +101,8 @@ for alpha in alpha_arr:
 plt.plot(d_arr,Erms_w1,label = 'Whiting 1')
 plt.plot(d_arr,Erms_w2,label = 'Whiting 2')
 plt.plot(d_arr,Erms_liu,label = 'Liu et al.')
-plt.plot(d_arr,Erms_sim,label = 'Simple\n({:.2f},{:.1f},{:.1f})'.format(dxv,dxG,dxL))
-plt.plot(d_arr,Erms_opt,label = 'Optimized\n({:.2f},{:.1f},{:.1f}) '.format(dxv,dxG,dxL))
+plt.plot(d_arr,Erms_sim,label = 'Simple\n({:.2f},{:.2f},{:.1f})'.format(dxv,dxG,dxL))
+plt.plot(d_arr,Erms_opt,label = 'Optimized\n({:.2f},{:.2f},{:.1f}) '.format(dxv,dxG,dxL))
 
 
 plt.grid(True)
@@ -124,6 +124,7 @@ E_est_opt = vl.average_error_optimized(dxv,dxG,dxL,alpha_arr,ksi_max = 100)
 plt.plot(d_arr,E_est_opt,'k--')
 
 plt.legend()
+plt.savefig('error_comparison.png')
 plt.show()
 
 sys.exit()
