@@ -1,12 +1,12 @@
 (
- + 4*SG1v2*aGL*dxG*tv 
- - 2*SG1v2*aGL*dxG 
+ + 4*SG1v2*aG*dxG*tv 
+ - 2*SG1v2*aG*dxG 
  - 4*SG1v2*dxG*tG*tv 
  + 2*SG1v2*dxG*tG 
- - 4*SG2v2*aGL*dxG**2*tG*tv 
- + 2*SG2v2*aGL*dxG**2*tG 
- + 2*SG2v2*aGL*dxG**2*tv 
- -   SG2v2*aGL*dxG**2 
+ - 4*SG2v2*aG*dxG**2*tG*tv 
+ + 2*SG2v2*aG*dxG**2*tG 
+ + 2*SG2v2*aG*dxG**2*tv 
+ -   SG2v2*aG*dxG**2 
  + 2*SG2v2*dxG**2*tG**2*tv 
  -   SG2v2*dxG**2*tG**2 
  + 4*SL1v2*aL*dxL*tv 

@@ -1,7 +1,7 @@
 from sympy import *
 
 tv,tG,tL,dxv,dxG,dxL = symbols('tv tG tL dxv dxG dxL',positive=True,real=True)
-av,aG,aL = symbols('av aGL aL',real=True)
+av,aG,aL = symbols('av aG aL',real=True)
 
 (SL1L1, SL1L2, SL2L2, SG1L1, SG1L2, SG2L1, SG2L2, SG1G1, SG1G2, SG2G2, Sv1v1, Sv2v2, SG1v2, SG2v2, SL1v2, SL2v2) = \
  symbols('SL1L1 SL1L2 SL2L2 SG1L1 SG1L2 SG2L1 SG2L2 SG1G1 SG1G2 SG2G2 Sv1v1 Sv2v2 SG1v2 SG2v2 SL1v2 SL2v2',real=True)
