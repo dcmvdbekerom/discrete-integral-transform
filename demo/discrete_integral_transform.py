@@ -1,9 +1,11 @@
 import numpy as np
 
+## Define constants for optimized weights:
 C1_GG = ((6 * np.pi - 16) / (15 * np.pi - 32)) ** (1 / 1.50)
 C1_LG = ((6 * np.pi - 16) / 3 * (np.log(2) / (2 * np.pi)) ** 0.5) ** (1 / 2.25)
 C2_GG = (2 * np.log(2) / 15) ** (1 / 1.50)
 C2_LG = ((2 * np.log(2)) ** 2 / 15) ** (1 / 2.25)
+
 
 ## Prepare width-axes based on number of gridpoints and linewidth data:
 def init_w_axis(dx, log_wi):
@@ -22,7 +24,7 @@ def get_indices(arr_i, axis):
 
 
 ## Calculate lineshape distribution matrix:
-def calc_matrix(v, dxG, dxL, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
+def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
     
     #  Initialize matrix:
     S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size))
@@ -37,6 +39,9 @@ def calc_matrix(v, dxG, dxL, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind
 
         dv = (v[-1] - v[0])/(v.size - 1)
         dxvGi = dv / np.exp(log_wGi)
+        dxG = (log_wG[-1] - log_wG[0])/(log_wG.size - 1)
+        dxL = (log_wL[-1] - log_wL[0])/(log_wL.size - 1)
+
         alpha_i = np.exp(log_wLi - log_wGi)
 
         R_Gv = 8 * np.log(2)
@@ -87,7 +92,7 @@ def apply_transform(v,log_wG,log_wL,S_klm):
         for m in range(log_wL.size):
             wG,wL = np.exp(log_wG[l]),np.exp(log_wL[m])
             gG_FT = np.exp(-(np.pi*x*wG)**2/(4*np.log(2)))
-            gL_FT = np.exp(-np.pi*x*wL)
+            gL_FT = np.exp(- np.pi*x*wL)
             gV_FT = gG_FT * gL_FT
             S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
     
@@ -106,7 +111,7 @@ def synthesize_spectrum(v, dxG, dxL, v0i, log_wGi, log_wLi, S0i, aw_kind = 'line
     log_wL = init_w_axis(dxL,log_wLi)
 
     # Calculate spectral matrix & apply transform:
-    S_klm = calc_matrix(v, dxG, dxL, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind)
+    S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind)
     I = apply_transform(v, log_wG, log_wL, S_klm)
         
     return I,S_klm
