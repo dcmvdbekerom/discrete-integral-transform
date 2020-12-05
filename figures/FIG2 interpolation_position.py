@@ -43,4 +43,7 @@ plt.yticks( [0,(1-a),a,1.0],['$0$','$(1-a_\\nu^i)$','$a_\\nu^i$','$1$'],fontsize
 
 plt.xlim(vmin,4.5)
 plt.tight_layout()
+plt.savefig('output/Fig2.png')
+plt.savefig('output/Fig2.pdf')
+
 plt.show()

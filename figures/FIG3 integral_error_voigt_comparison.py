@@ -5,12 +5,13 @@ import voigtlib as vl
 markersize = 7
 NN = 50
 Nlevels = 10
+fontsize = 14
 
 dx = 0.01
 x_max = 10.0
 x = np.arange(0,x_max,dx)
 
-dxv  = 0.05
+dxv  = 0.1
 dxG  = 0.14
 dxL  = 0.2
 
@@ -34,10 +35,10 @@ for alpha,label in zip(alpha_arr,labels):
     axes[0,1].set_title('$\\alpha={:s}$\n'.format(label),fontsize=16)
 
     for tG,ax in zip(tG_arr,axes[-1,:]):
-        ax.set_xlabel('$a_G$\n$t_G={:.1f}$'.format(tG),fontsize=12)
+        ax.set_xlabel('$a_G$\n$t_G={:.1f}$'.format(tG),fontsize=14)
         
     for tL,ax in zip(tL_arr,axes[::-1,0]):
-        ax.set_ylabel('$t_L={:.1f}$\n$a_L$'.format(tL),fontsize=12)
+        ax.set_ylabel('$t_L={:.1f}$\n$a_L$'.format(tL),fontsize=14)
   
     for tL,axh in zip(tL_arr,axes[::-1]):
         for tG,axhv in zip(tG_arr,axh):
@@ -72,6 +73,7 @@ for alpha,label in zip(alpha_arr,labels):
             Z2 = vl.approximate_error(av,X,Y,tv,tG,tL,dxv,dxG,dxL,error_integrals)
             CS2 = axhv.contour(X,Y,Z2,levels = Nlevels,colors='k',linestyles='dashed')
 
-    plt.savefig('{:.3f}_Error-contours_tv={:.1f}_alpha={:.3f}.png'.format(alpha,tv,alpha))
+    plt.savefig('output/Fig3_alpha={:.3f}.pdf'.format(alpha,tv,alpha))
+    plt.savefig('output/Fig3_alpha={:.3f}.png'.format(alpha,tv,alpha))
     plt.show()
 ##    plt.clf()

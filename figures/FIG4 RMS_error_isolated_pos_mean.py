@@ -15,7 +15,7 @@ dksi = 1 / (2 * x_max)
 d_arr = np.array([-0.99] + list(np.arange(-0.95,1.0,0.025)) + [0.99])
 alpha_arr = (1+d_arr)/(1-d_arr)
 
-dxv = 0.05
+dxv = 0.1
 dxG = 0.14
 dxL = 0.2
 
@@ -101,8 +101,8 @@ for alpha in alpha_arr:
 plt.plot(d_arr,Erms_w1,label = 'Whiting 1')
 plt.plot(d_arr,Erms_w2,label = 'Whiting 2')
 plt.plot(d_arr,Erms_liu,label = 'Liu et al.')
-plt.plot(d_arr,Erms_sim,label = 'Simple\n({:.2f},{:.2f},{:.1f})'.format(dxv,dxG,dxL))
-plt.plot(d_arr,Erms_opt,label = 'Optimized\n({:.2f},{:.2f},{:.1f}) '.format(dxv,dxG,dxL))
+plt.plot(d_arr,Erms_sim,label = 'Simple\n({:.1f},{:.2f},{:.1f})'.format(dxv,dxG,dxL))
+plt.plot(d_arr,Erms_opt,label = 'Optimized\n({:.1f},{:.2f},{:.1f}) '.format(dxv,dxG,dxL))
 
 
 plt.grid(True)
@@ -111,8 +111,8 @@ plt.axvline(-1,ls='--',c='gray')
 plt.axvline(1,ls='--',c='gray')
 plt.xlim(-1.1,1.1)
 
-plt.ylabel('RMS-error')
-plt.xlabel('$Gaussian\\quad\\quad\\quad\\quad \\leftarrow \\quad\\quad\\quad\\quad\\quad d=\\frac{w_L-w_G}{w_L+w_G} \\quad\\quad\\quad\\quad\\quad \\rightarrow \\quad\\quad\\quad\\quad Lorentzian$')
+plt.ylabel('RMS-error',fontsize = 12)
+plt.xlabel('$Gaussian\\quad\\quad\\quad\\quad \\leftarrow \\quad\\quad\\quad\\quad\\quad d=\\frac{w_L-w_G}{w_L+w_G} \\quad\\quad\\quad\\quad\\quad \\rightarrow \\quad\\quad\\quad\\quad Lorentzian$',fontsize = 12)
 
 
 ## Plot approximated errors:
@@ -122,9 +122,10 @@ plt.plot(d_arr,E_est_sim,'k--')
 
 E_est_opt = vl.average_error_optimized(dxv,dxG,dxL,alpha_arr,ksi_max = 100)
 plt.plot(d_arr,E_est_opt,'k--')
-
-plt.legend()
-plt.savefig('error_comparison.png')
+plt.subplots_adjust(left=0.15,bottom = 0.15)
+plt.legend(fontsize=12)
+plt.savefig('output/Fig4.pdf')
+plt.savefig('output/Fig4.png')
 plt.show()
 
 sys.exit()
