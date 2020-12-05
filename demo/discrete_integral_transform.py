@@ -115,16 +115,3 @@ def synthesize_spectrum(v, dxG, dxL, v0i, log_wGi, log_wLi, S0i, aw_kind = 'line
     I = apply_transform(v, log_wG, log_wL, S_klm)
         
     return I,S_klm
-
-for alpha_i in [0.000000001,100000000]:
-
-    R_GG = 2 - 1 / (C1_GG + C2_GG * alpha_i ** (2 / 1.50)) ** 1.50
-    R_GL = -2 * np.log(2) * alpha_i ** 2                                               # a -> oo, R_GL -> -oo
-    R_LG = 1 / (C1_LG * alpha_i ** (1 / 2.25) + C2_LG * alpha_i ** (4 / 2.25)) ** 2.25 # a ->  0, R_LG ->  oo
-
-    print(alpha_i)
-    print(R_GG)
-    print(R_GL)
-    print(R_LG)
-    print('')
-
