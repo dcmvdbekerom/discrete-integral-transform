@@ -11,7 +11,7 @@ dx = 0.01
 x_max = 10.0
 x = np.arange(0,x_max,dx)
 
-dxv  = 0.1
+dxv  = 0.05
 dxG  = 0.14
 dxL  = 0.2
 
