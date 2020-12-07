@@ -62,7 +62,7 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
 
 
     else:
-        assert aw_kind == "linear"
+        assert aw_kind == "simple"
         avi = tvi
         aGi = tGi
         aLi = tLi
@@ -100,7 +100,7 @@ def apply_transform(v,log_wG,log_wL,S_klm):
 
 
 ## Synthesize spectrum:
-def synthesize_spectrum(v, dxG, dxL, v0i, log_wGi, log_wLi, S0i, aw_kind = 'linear'):
+def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, aw_kind = 'simple'):
 
     # Only process lines within range:
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
