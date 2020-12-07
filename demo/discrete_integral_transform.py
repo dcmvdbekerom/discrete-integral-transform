@@ -60,9 +60,7 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
         aLi = tLi + (R_LG * tGi * (tGi - 1) * dxG**2 +
                      R_LL * tLi * (tLi - 1) * dxL**2 ) / (2 * dxL)
 
-
     else:
-        assert aw_kind == "simple"
         avi = tvi
         aGi = tGi
         aLi = tLi
