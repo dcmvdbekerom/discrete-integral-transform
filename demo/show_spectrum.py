@@ -25,7 +25,7 @@ p =    0.1 #bar
 
 t0 = perf_counter()
 v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
-I0,S_klm = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,aw_kind = 'optimized')
+I0,S_klm = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,optimized=False)
 print('{:.2f}M lines\n{:.3f} s'.format(len(v0i)*1e-6,perf_counter()-t0))
 
 plt.plot(v,I0,'-')

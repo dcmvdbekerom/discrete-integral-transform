@@ -1,6 +1,6 @@
 import numpy as np
 
-## Define constants for optimized weights:
+## Define constants for optimized weights (Eq 3.20 & Table 1):
 C1_GG = ((6 * np.pi - 16) / (15 * np.pi - 32)) ** (1 / 1.50)
 C1_LG = ((6 * np.pi - 16) / 3 * (np.log(2) / (2 * np.pi)) ** 0.5) ** (1 / 2.25)
 C2_GG = (2 * np.log(2) / 15) ** (1 / 1.50)
@@ -24,18 +24,19 @@ def get_indices(arr_i, axis):
 
 
 ## Calculate lineshape distribution matrix:
-def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
+def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized):
     
     #  Initialize matrix:
     S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size))
 
     #  Calculate grid indices and alignment:    
-    ki0, ki1, tvi = get_indices(v0i, v)
-    li0, li1, tGi = get_indices(log_wGi, log_wG)
-    mi0, mi1, tLi = get_indices(log_wLi, log_wL)
+    ki0, ki1, tvi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
+    li0, li1, tGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
+    mi0, mi1, tLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
 
     # Calculate weights:
-    if aw_kind == "optimized":
+    if optimized:
+        #Eqs 3.18 & 3.19:
 
         dv = (v[-1] - v[0])/(v.size - 1)
         dxvGi = dv / np.exp(log_wGi)
@@ -61,11 +62,12 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind):
                      R_LL * tLi * (tLi - 1) * dxL**2 ) / (2 * dxL)
 
     else:
+        #Eq 3.11:
         avi = tvi
         aGi = tGi
         aLi = tLi
     
-    # Add lines to spectral matrix:
+    # Add lines to matrix -- Eqs 2.8 & 2.10:
     np.add.at(S_klm, (ki0, li0, mi0), S0i * (1-avi) * (1-aGi) * (1-aLi))
     np.add.at(S_klm, (ki0, li0, mi1), S0i * (1-avi) * (1-aGi) *    aLi )
     np.add.at(S_klm, (ki0, li1, mi0), S0i * (1-avi) *    aGi  * (1-aLi))
@@ -84,13 +86,13 @@ def apply_transform(v,log_wG,log_wL,S_klm):
     dv    = (v[-1] - v[0]) / (v.size - 1)
     x     = np.arange(v.size + 1) / (2 * v.size * dv)
 
-    # Sum over spectral matrix:
+    # Sum over lineshape distribution matrix -- Eqs 3.2 & 3.3:
     S_k_FT = np.zeros(v.size + 1, dtype = np.complex64)
     for l in range(log_wG.size):
         for m in range(log_wL.size):
-            wG,wL = np.exp(log_wG[l]),np.exp(log_wL[m])
-            gG_FT = np.exp(-(np.pi*x*wG)**2/(4*np.log(2)))
-            gL_FT = np.exp(- np.pi*x*wL)
+            wG_l,wL_m = np.exp(log_wG[l]),np.exp(log_wL[m])
+            gG_FT = np.exp(-(np.pi*x*wG_l)**2/(4*np.log(2)))
+            gL_FT = np.exp(- np.pi*x*wL_m)
             gV_FT = gG_FT * gL_FT
             S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
     
@@ -98,18 +100,18 @@ def apply_transform(v,log_wG,log_wL,S_klm):
 
 
 ## Synthesize spectrum:
-def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, aw_kind = 'simple'):
+def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, optimized = False):
 
     # Only process lines within range:
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
     v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
 
     # Initialize width-axes:
-    log_wG = init_w_axis(dxG,log_wGi)
-    log_wL = init_w_axis(dxL,log_wLi)
+    log_wG = init_w_axis(dxG,log_wGi) #Eq 3.8
+    log_wL = init_w_axis(dxL,log_wLi) #Eq 3.9
 
-    # Calculate spectral matrix & apply transform:
-    S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, aw_kind)
-    I = apply_transform(v, log_wG, log_wL, S_klm)
+    # Calculate matrix & apply transform:
+    S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized)
+    I = apply_transform(v, log_wG, log_wL, S_klm)                               
         
     return I,S_klm
