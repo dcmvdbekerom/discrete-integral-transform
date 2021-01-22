@@ -80,27 +80,39 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized):
     return S_klm
 
 
-## Apply transform:
-def apply_transform(v,log_wG,log_wL,S_klm):
+def calc_gV_FT(x,wG,wL):
+    gG_FT = np.exp(-(np.pi*x*wG)**2/(4*np.log(2)))
+    gL_FT = np.exp(- np.pi*x*wL)
+    return gG_FT * gL_FT
 
-    dv    = (v[-1] - v[0]) / (v.size - 1)
-    x     = np.arange(v.size + 1) / (2 * v.size * dv)
+
+## Apply transform:
+def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
+
+    dv     = (v[-1] - v[0]) / (v.size - 1)
+    x      = np.arange(v.size + 1) / (2 * v.size * dv)
+    x_fold = (x,x[::-1])
 
     # Sum over lineshape distribution matrix -- Eqs 3.2 & 3.3:
     S_k_FT = np.zeros(v.size + 1, dtype = np.complex64)
     for l in range(log_wG.size):
         for m in range(log_wL.size):
             wG_l,wL_m = np.exp(log_wG[l]),np.exp(log_wL[m])
-            gG_FT = np.exp(-(np.pi*x*wG_l)**2/(4*np.log(2)))
-            gL_FT = np.exp(- np.pi*x*wL_m)
-            gV_FT = gG_FT * gL_FT
+            gV_FT = calc_gV_FT(x,wG_l,wL_m)
+
+            # Apply folding if needed: 
+            n = 1
+            while calc_gV_FT(n/(2*dv),wG_l,wL_m) >= folding_thresh:
+                gV_FT += calc_gV_FT(n/(2*dv) + x_fold[n&1],wG_l,wL_m)
+                n += 1
+                    
             S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
     
     return np.fft.irfft(S_k_FT)[:v.size] / dv
 
 
 ## Synthesize spectrum:
-def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, optimized = False):
+def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, optimized = False, folding_thresh = 1e-6):
 
     # Only process lines within range:
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
@@ -112,6 +124,6 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, op
 
     # Calculate matrix & apply transform:
     S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized)
-    I = apply_transform(v, log_wG, log_wL, S_klm)                               
+    I = apply_transform(v, log_wG, log_wL, S_klm, folding_thresh)                               
         
     return I,S_klm
