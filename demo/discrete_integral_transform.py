@@ -1,4 +1,5 @@
 import numpy as np
+from time import perf_counter
 
 ## Define constants for optimized weights (Eq 3.20 & Table 1):
 C1_GG = ((6 * np.pi - 16) / (15 * np.pi - 32)) ** (1 / 1.50)
@@ -208,6 +209,8 @@ def synthesize_spectrum(v,
                         Iexp = None,
                         optimized = False, folding_thresh = 1e-6):
 
+    t0 = perf_counter()
+
     # Only process lines within range:
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
     v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
@@ -220,13 +223,19 @@ def synthesize_spectrum(v,
     S_klm, indices, intensities = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized)
     I = apply_transform(v, log_wG, log_wL, S_klm, folding_thresh)
 
+    print('{:.3f}s Spectrum'.format(perf_counter() - t0))
+
+    
+
     # Calculate Jacobian:
     if type(Iexp) == type(None):
         J = tuple(4*[np.zeros(S0i.size)])
     else:
+        t1 = perf_counter()
         integrals = jacobian_integrals(v, log_wG, log_wL, I, Iexp)
         J = calc_jacobian(integrals, indices, intensities, S0i, np.exp(log_wGi))
-        
+        print('{:.3f}s Jacobian'.format(perf_counter() - t1))
+    
     return I, S_klm, J
 
 

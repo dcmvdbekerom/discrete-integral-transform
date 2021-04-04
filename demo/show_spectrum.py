@@ -23,16 +23,15 @@ dxL = 0.2
 T = 1000.0 #K
 p =    0.1 #bar
 
-t0 = perf_counter()
+
+
+
 v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
+print('{:.2f}M lines '.format(len(v0i)*1e-6))
 I0,S_klm,J = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,optimized=False)
-print('{:.2f}M lines\n{:.3f} s'.format(len(v0i)*1e-6,perf_counter()-t0))
 
 Iexp = I0 + np.random.normal(0,0.05,I0.size)
-
-t1 = perf_counter()
 I1,S_klm,J = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,Iexp=Iexp,dxG=dxG,dxL=dxL,optimized=False)
-print('{:.3f} s Jacobian'.format(len(v0i)*1e-6,perf_counter()-t1))
 
 
 plt.plot(v,Iexp,'.')
