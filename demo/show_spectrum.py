@@ -14,7 +14,7 @@ init_database([HITEMP_path + "02_2000-2125_HITEMP2010.par",
 
 v_min = 2200.0 #cm-1
 v_max = 2400.0 #cm-1
-dv =     0.001 #cm-1
+dv =     0.002 #cm-1
 v = np.arange(v_min,v_max,dv) #cm-1
 
 dxG = 0.2

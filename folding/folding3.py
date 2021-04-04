@@ -5,17 +5,17 @@ from fractions import Fraction
 gG = lambda v,w: (2/w)*np.sqrt(np.log(2)/np.pi)*np.exp(-4*np.log(2)*(v/w)**2)
 gL = lambda v,w: (1/np.pi) * (w/2) / (v**2 + (w/2)**2)*dv
 
-gG_FT = lambda x,w: np.exp(-(np.pi*x*wG)**2/(4*np.log(2)))
-gL_FT = lambda x,w: np.exp(- np.pi*x*wL)
+gG_FT = lambda x,w: np.exp(-(np.pi*x*w)**2/(4*np.log(2)))
+gL_FT = lambda x,w: np.exp(- np.pi*x*w)
 
-dv = 0.001 #cm-1
+dv = 0.01 #cm-1
 v_max = 100.0 #cm-1
 v_arr = np.arange(0,v_max,dv)
 N_zpad = v_arr.size ## can be 0..v_arr.size
 x_arr = np.linspace(-1/dv,1/dv,v_arr.size*4)
 folding_thresh = 1e-6
 
-wG = dv
+w = dv
 
 # Current RADIS implementation:
 
@@ -23,10 +23,10 @@ fig, (ax2) = plt.subplots(1,1,figsize=(10,4))
 plt.subplots_adjust(left=0.05,right=0.95,bottom=0.15)
 
 
-plt.plot(x_arr,gG_FT(x_arr,wG))
+plt.plot(x_arr,gG_FT(x_arr,w))
 for n in range(1,3):
-    plt.plot(x_arr,gG_FT( n/dv + x_arr,wG))
-    plt.plot(x_arr,gG_FT(-n/dv + x_arr,wG))
+    plt.plot(x_arr,gG_FT(-n/dv + x_arr,w))
+    plt.plot(x_arr,gG_FT( n/dv + x_arr,w))
 
 
 ax2.axvspan(-1/dv, 0, alpha=0.5, color='w',zorder = 10)

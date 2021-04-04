@@ -6,10 +6,10 @@ from matplotlib.patches import ConnectionPatch
 gG = lambda v,w: (2/w)*np.sqrt(np.log(2)/np.pi)*np.exp(-4*np.log(2)*(v/w)**2)
 gL = lambda v,w: (1/np.pi) * (w/2) / (v**2 + (w/2)**2)*dv
 
-gG_FT = lambda x,w: np.exp(-(np.pi*x*wG)**2/(4*np.log(2)))
-gL_FT = lambda x,w: np.exp(- np.pi*x*wL)
+gG_FT = lambda x,w: np.exp(-(np.pi*x*w)**2/(4*np.log(2)))
+gL_FT = lambda x,w: np.exp(- np.pi*x*w)
 
-dv = 0.001 #cm-1
+dv = 0.01 #cm-1
 v_max = 100.0 #cm-1
 v_arr = np.arange(0,v_max,dv)
 N_zpad = v_arr.size ## can be 0..v_arr.size
@@ -24,7 +24,7 @@ plt.subplots_adjust(left=0.05,right=0.95,bottom=0.15)
 axins = ax1.inset_axes([0.45, 0.15, 0.50, 0.40])
 axins.ticklabel_format(useOffset=False, axis='x')
 axins.set_xlim(1.5*dv,4.5*dv)
-axins.set_ylim(-22,22)
+axins.set_ylim(-0.022/dv,0.022/dv)
 axins.get_xaxis().set_visible(False)
 axins.get_yaxis().set_visible(False)
 
