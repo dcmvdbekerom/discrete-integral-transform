@@ -23,9 +23,6 @@ dxL = 0.2
 T = 1000.0 #K
 p =    0.1 #bar
 
-
-
-
 v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
 print('{:.2f}M lines '.format(len(v0i)*1e-6))
 I0,S_klm,J = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,optimized=False)

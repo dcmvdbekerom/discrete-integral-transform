@@ -129,7 +129,7 @@ def jacobian_integrals(v, log_wG, log_wL, Isyn, Iexp, folding_thresh = 1e-6):
     dv  = (v[-1] - v[0]) / (v.size - 1)
     x   = np.fft.rfftfreq(2 * v.size, dv)
     dxL = (log_wL[-1] - log_wL[0])/(log_wL.size - 1)
-    fL  =  np.exp(0.5 * dxL)
+    fL  = np.exp(0.5 * dxL)
     wG  = np.exp(log_wG)
     wL  = np.exp(log_wL)
 
@@ -141,9 +141,7 @@ def jacobian_integrals(v, log_wG, log_wL, Isyn, Iexp, folding_thresh = 1e-6):
     DeltaI = np.zeros(2 * v.size)
     DeltaI[:v.size] = Iexp - Isyn
     DeltaI_FT = np.fft.rfft(DeltaI) * dv
-
-    int1 = np.sum(DeltaI[:v.size] * Iexp) * dv
-    int2 = np.sum(DeltaI[:v.size]**2) * dv
+    expL = np.sum(DeltaI[:v.size]**2) * dv
 
     IS0 = np.zeros((2 * v.size, log_wG.size, log_wL.size))
     Iv0 = np.zeros((2 * v.size, log_wG.size, log_wL.size))
@@ -173,12 +171,12 @@ def jacobian_integrals(v, log_wG, log_wL, Isyn, Iexp, folding_thresh = 1e-6):
 
             Iconv_prev = Iconv_next            
 
-    return int1, int2, IS0, Iv0, IwG, IwL
+    return expL, IS0, Iv0, IwG, IwL
 
 
 def calc_jacobian(integrals, indices, intensities, S0i, wGi):
 
-    int1,int2,IS0,Iv0,IwG,IwL = integrals
+    expL,IS0,Iv0,IwG,IwL = integrals
 
     int_DS0 = np.zeros(S0i.size)
     int_Dv0 = np.zeros(S0i.size)
@@ -194,10 +192,10 @@ def calc_jacobian(integrals, indices, intensities, S0i, wGi):
     int_DS0 /= S0i
     int_DwG *= wGi
     
-    dLdS0 = 2 * (int1 - int_DS0) / int2
-    dLdv0 = 2 * (int1 - int_Dv0) / int2
-    dLdwG = 2 * (int1 - int_DwG) / int2
-    dLdwL = 2 * (int1 - int_DwL) / int2
+    dLdS0 = -2 * int_DS0 / expL
+    dLdv0 = -2 * int_Dv0 / expL
+    dLdwG = -2 * int_DwG / expL
+    dLdwL = -2 * int_DwL / expL
     
     return dLdS0, dLdv0, dLdwG, dLdwL
     
@@ -222,12 +220,9 @@ def synthesize_spectrum(v,
     # Calculate matrix & apply transform:
     S_klm, indices, intensities = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized)
     I = apply_transform(v, log_wG, log_wL, S_klm, folding_thresh)
-
     print('{:.3f}s Spectrum'.format(perf_counter() - t0))
 
-    
-
-    # Calculate Jacobian:
+        # Calculate Jacobian:
     if type(Iexp) == type(None):
         J = tuple(4*[np.zeros(S0i.size)])
     else:
