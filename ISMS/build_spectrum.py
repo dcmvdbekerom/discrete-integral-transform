@@ -50,13 +50,13 @@ for S0, v0, wL, wG in zip(S0i, v0i, wLi, wGi):
     fig.canvas.flush_events()
     plt.savefig(fname2.format(i),dpi=100.0)
     pImage=Image.open(fname2.format(i))
-    gif_images.append(pImage)
+    gif_images.append(pImage.convert('RGB').convert('P', palette=Image.ADAPTIVE))
 
     print(i)
     i+=1
     
 gif_images[0].save('build_spectra.gif',
                     save_all=True,
-                    duration = i*[500,50],
+                    duration = i*[500,100],
                     loop = 0,
                     append_images=gif_images[1:])
