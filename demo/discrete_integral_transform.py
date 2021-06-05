@@ -1,4 +1,5 @@
 import numpy as np
+from time import perf_counter
 
 ## Define constants for optimized weights (Eq 3.20 & Table 1):
 C1_GG = ((6 * np.pi - 16) / (15 * np.pi - 32)) ** (1 / 1.50)
@@ -66,53 +67,147 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized):
         avi = tvi
         aGi = tGi
         aLi = tLi
-    
+
+    indices = [ (ki0, li0, mi0),
+                (ki0, li0, mi1),
+                (ki0, li1, mi0),
+                (ki0, li1, mi1),
+                (ki1, li0, mi0),
+                (ki1, li0, mi1),
+                (ki1, li1, mi0),
+                (ki1, li1, mi1)]
+
+    intensities = [S0i * (1-avi) * (1-aGi) * (1-aLi),
+                   S0i * (1-avi) * (1-aGi) *    aLi ,
+                   S0i * (1-avi) *    aGi  * (1-aLi),
+                   S0i * (1-avi) *    aGi  *    aLi ,
+                   S0i *    avi  * (1-aGi) * (1-aLi),
+                   S0i *    avi  * (1-aGi) *    aLi ,
+                   S0i *    avi  *    aGi  * (1-aLi),
+                   S0i *    avi  *    aGi  *    aLi ]
+
     # Add lines to matrix -- Eqs 2.8 & 2.10:
-    np.add.at(S_klm, (ki0, li0, mi0), S0i * (1-avi) * (1-aGi) * (1-aLi))
-    np.add.at(S_klm, (ki0, li0, mi1), S0i * (1-avi) * (1-aGi) *    aLi )
-    np.add.at(S_klm, (ki0, li1, mi0), S0i * (1-avi) *    aGi  * (1-aLi))
-    np.add.at(S_klm, (ki0, li1, mi1), S0i * (1-avi) *    aGi  *    aLi )
-    np.add.at(S_klm, (ki1, li0, mi0), S0i *    avi  * (1-aGi) * (1-aLi))
-    np.add.at(S_klm, (ki1, li0, mi1), S0i *    avi  * (1-aGi) *    aLi )
-    np.add.at(S_klm, (ki1, li1, mi0), S0i *    avi  *    aGi  * (1-aLi))
-    np.add.at(S_klm, (ki1, li1, mi1), S0i *    avi  *    aGi  *    aLi )
+    for klm, I in zip(indices, intensities):
+        np.add.at(S_klm, klm, I)
     
-    return S_klm
+    return S_klm, indices, intensities
 
 
-def calc_gV_FT(x,wG,wL):
-    gG_FT = np.exp(-(np.pi*x*wG)**2/(4*np.log(2)))
-    gL_FT = np.exp(- np.pi*x*wL)
-    return gG_FT * gL_FT
+def calc_gV_FT(x,wG,wL,dv,folding_thresh):
+
+    gV_FT = lambda x,wG,wL: np.exp(-((np.pi*x*wG)**2/(4*np.log(2)) + np.pi*x*wL))
+    x_fold = (x,x[::-1])
+    
+    result = gV_FT(x,wG,wL)
+    n = 1
+    while gV_FT(n/(2*dv),wG,wL) >= folding_thresh:
+        result += gV_FT(n/(2*dv) + x_fold[n&1],wG,wL)
+        n += 1
+
+    return result
 
 
 ## Apply transform:
 def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
 
     dv     = (v[-1] - v[0]) / (v.size - 1)
-    x      = np.arange(v.size + 1) / (2 * v.size * dv)
-    x_fold = (x,x[::-1])
+    x      = np.fft.rfftfreq(2 * v.size, dv)
 
     # Sum over lineshape distribution matrix -- Eqs 3.2 & 3.3:
     S_k_FT = np.zeros(v.size + 1, dtype = np.complex64)
     for l in range(log_wG.size):
         for m in range(log_wL.size):
-            wG_l,wL_m = np.exp(log_wG[l]),np.exp(log_wL[m])
-            gV_FT = calc_gV_FT(x,wG_l,wL_m)
-
-            # Apply folding if needed: 
-            n = 1
-            while calc_gV_FT(n/(2*dv),wG_l,wL_m) >= folding_thresh:
-                gV_FT += calc_gV_FT(n/(2*dv) + x_fold[n&1],wG_l,wL_m)
-                n += 1
-                    
+            wG_l,wL_m = np.exp(log_wG[l]), np.exp(log_wL[m])
+            gV_FT = calc_gV_FT(x, wG_l, wL_m, dv, folding_thresh)               
             S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
     
     return np.fft.irfft(S_k_FT)[:v.size] / dv
 
 
+def jacobian_integrals(v, log_wG, log_wL, Isyn, Iexp, folding_thresh = 1e-6):
+
+    dv  = (v[-1] - v[0]) / (v.size - 1)
+    x   = np.fft.rfftfreq(2 * v.size, dv)
+    dxL = (log_wL[-1] - log_wL[0])/(log_wL.size - 1)
+    fL  = np.exp(0.5 * dxL)
+    wG  = np.exp(log_wG)
+    wL  = np.exp(log_wL)
+
+    ## Note: we can't use the I_FT from earlier because the latter half
+    ## must be zeroed first to prevent circular convolution.
+    ## This adds one FT per step, which could be eliminated if
+    ## circular convolution is not an issue.
+    
+    DeltaI = np.zeros(2 * v.size)
+    DeltaI[:v.size] = Iexp - Isyn
+    DeltaI_FT = np.fft.rfft(DeltaI) * dv
+    expL = np.sum(DeltaI[:v.size]**2) * dv
+
+    IS0 = np.zeros((2 * v.size, log_wG.size, log_wL.size))
+    Iv0 = np.zeros((2 * v.size, log_wG.size, log_wL.size))
+    IwG = np.zeros((2 * v.size, log_wG.size, log_wL.size))
+    IwL = np.zeros((2 * v.size, log_wG.size, log_wL.size))
+
+    for l in range(wG.size):
+        gV_FT = calc_gV_FT(x,wG[l], wL[0] / fL, dv, folding_thresh)
+        Iconv_prev = np.fft.irfft(DeltaI_FT * gV_FT)
+
+        for m in range(wL.size):
+            gV_FT = calc_gV_FT(x, wG[l], wL[m] * fL, dv, folding_thresh)
+            Iconv_next = np.fft.irfft(DeltaI_FT * gV_FT)
+
+            ## We calculate the derivates numerically to prevent having to redo
+            ## the FT's with the exact derivatives. 
+
+            IS0[ :  ,l,m] = (Iconv_prev + Iconv_next) / 2
+            
+            Iv0[1:-1,l,m] = (IS0[2:,l,m] - IS0[:-2,l,m]) / (2*dv)
+            Iv0[0   ,l,m] = (IS0[1 ,l,m] - IS0[ -1,l,m]) / (2*dv)
+
+            IwG[1:-1,l,m] = (IS0[2:,l,m] + IS0[:-2,l,m] - 2 * IS0[1:-1,l,m]) / (8 * np.log(2) * dv**2)
+            IwG[0   ,l,m] = (IS0[1 ,l,m] + IS0[ -1,l,m] - 2 * IS0[0   ,l,m]) / (8 * np.log(2) * dv**2)
+
+            IwL[ :  ,l,m] = (Iconv_next - Iconv_prev) / (wL[m] * dxL)
+
+            Iconv_prev = Iconv_next            
+
+    return expL, IS0, Iv0, IwG, IwL
+
+
+def calc_jacobian(integrals, indices, intensities, S0i, wGi):
+
+    expL,IS0,Iv0,IwG,IwL = integrals
+
+    int_DS0 = np.zeros(S0i.size)
+    int_Dv0 = np.zeros(S0i.size)
+    int_DwG = np.zeros(S0i.size)
+    int_DwL = np.zeros(S0i.size)
+
+    for klm, I in zip(indices, intensities):
+        int_DS0 += I * IS0[klm]
+        int_Dv0 += I * Iv0[klm]
+        int_DwG += I * IwG[klm]
+        int_DwL += I * IwL[klm]
+
+    int_DS0 /= S0i
+    int_DwG *= wGi
+    
+    dLdS0 = -2 * int_DS0 / expL
+    dLdv0 = -2 * int_Dv0 / expL
+    dLdwG = -2 * int_DwG / expL
+    dLdwL = -2 * int_DwL / expL
+    
+    return dLdS0, dLdv0, dLdwG, dLdwL
+    
+
 ## Synthesize spectrum:
-def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, optimized = False, folding_thresh = 1e-6):
+def synthesize_spectrum(v,
+                        v0i, log_wGi, log_wLi, S0i,
+                        dxG = 0.14, dxL = 0.2,
+                        Iexp = None,
+                        optimized = False, folding_thresh = 1e-6):
+
+    t0 = perf_counter()
 
     # Only process lines within range:
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
@@ -123,7 +218,19 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, op
     log_wL = init_w_axis(dxL,log_wLi) #Eq 3.9
 
     # Calculate matrix & apply transform:
-    S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized)
-    I = apply_transform(v, log_wG, log_wL, S_klm, folding_thresh)                               
-        
-    return I,S_klm
+    S_klm, indices, intensities = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized)
+    I = apply_transform(v, log_wG, log_wL, S_klm, folding_thresh)
+    print('{:.3f}s Spectrum'.format(perf_counter() - t0))
+
+        # Calculate Jacobian:
+    if type(Iexp) == type(None):
+        J = tuple(4*[np.zeros(S0i.size)])
+    else:
+        t1 = perf_counter()
+        integrals = jacobian_integrals(v, log_wG, log_wL, I, Iexp)
+        J = calc_jacobian(integrals, indices, intensities, S0i, np.exp(log_wGi))
+        print('{:.3f}s Jacobian'.format(perf_counter() - t1))
+    
+    return I, S_klm, J
+
+
