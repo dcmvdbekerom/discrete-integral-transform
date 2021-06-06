@@ -4,10 +4,12 @@ from matplotlib import patches
 from numpy import log
 from matplotlib.widgets import Slider
 from PIL import Image
+import sys
 
 size = 14
 vmin = 0.5
-k   = np.arange(5)
+Nk=10
+k   = np.arange(Nk)
 kt = 2.2
 ki = int(kt)
 t = kt-ki
@@ -19,7 +21,7 @@ Si[ki+1] =    a
 ht  = 0.05
 hdv = 0.19
 
-
+fig = plt.figure(figsize=(10,3.5))
 
 p0  = plt.bar(k,Si,width=1.0,fc='cornsilk',ec='k')
 p1, = plt.plot([ki+t,ki+t],[0,1],'r-')
@@ -39,14 +41,15 @@ t2 = plt.text(ki+0.5*t,ht+0.02,'$t\\Delta \\nu$',fontsize = size,ha='center',bac
 a2 = plt.annotate(text='', xy=(ki,ht), xytext=(ki+t,ht), arrowprops=dict(arrowstyle='<->'))
 
 
-plt.yticks( [0,(1-a),a,1.0],['$0$','$(1-t)$','$t$','$1$'],fontsize = size)
+plt.yticks( [0,(1-a),a,1.0],['$0$','$(1-a)$','$a$','$1$'],fontsize = size)
 
-plt.xticks( [0,1,ki,ki+t,ki+1,4],
+plt.xticks( [0,1,ki,ki+t,ki+1,Nk-1],
             ['','','$\\nu[k]$','\n$\\nu_0$','$\\nu[k+1]$',''],
             fontsize = size,
             ha='left')
 ax=  plt.gca()
-plt.xlim(vmin,4.5)
+plt.xlim(vmin,Nk-0.5)
+plt.subplots_adjust(left=0.085,right=0.950,top=0.910,bottom=0.175)
 ##plt.subplots_adjust(left=0.15,right=0.9,top=0.9,bottom=0.3)
 ##
 ##axslider = plt.axes([0.15, 0.1, 0.70, 0.03], facecolor='cornsilk')
@@ -91,22 +94,25 @@ def update(val):
     a2.remove()
     a2 = plt.annotate(text='', xy=(ki,ht), xytext=(ki+t,ht), arrowprops=dict(arrowstyle='<->'))
 
-    i_list = [i for i in range(5)]
+    i_list = [i for i in range(Nk)]
     x_list =  i_list[:ki+1]+[ki+t]+i_list[ki+1:]
-    s_list = ki*['']+['$\\nu[k]$','\n$\\nu_0$','$\\nu[k+1]$']+(3-ki)*['']
+    s_list = ki*['']+['$\\nu[k]$','\n$\\nu_0$','$\\nu[k+1]$']+(Nk-2-ki)*['']
 
     plt.xticks(x_list,s_list,
             fontsize = size,
             ha='left')
-    plt.yticks( [0,(1-a),a,1.0],['$0$','$(1-t)$','$t$','$1$'],fontsize = size)
+    plt.yticks( [0,(1-a),a,1.0],['$0$','$(1-a)$','$a$','$1$'],fontsize = size)
 
-    plt.xlim(vmin,4.5)
+    plt.xlim(vmin,Nk-0.5)
     plt.gcf().canvas.draw_idle()
     
 ##t_slider.on_changed(update)
 
+##plt.show()
+##sys.exit()
+
 gif_images = []
-for kt in np.linspace(1.01,3.99,200):
+for kt in np.linspace(1.01,Nk-1.01,400):
     print(kt)
     update(kt)
     fname = 'output/pos_weight_{:.3f}.png'.format(kt)
