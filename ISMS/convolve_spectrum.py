@@ -38,8 +38,8 @@ for S0, v0 in zip(S0i, v0i):
     I = S0 * voigt_lineshape(v_arr - v0, wL/2, wV/2, jit=False)
     I_arr += I
 
-p1.remove()
-ax[0].plot(v_arr_ls,np.zeros(v_arr.size),c='tab:blue')
+##p1.remove()
+##ax[0].plot(v_arr_ls,np.zeros(v_arr.size),c='tab:blue')
 ax[1].plot(v_arr,I_arr)
 lines.remove()
 plt.savefig('convolution_after.png',dpi=100)
