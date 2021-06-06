@@ -8,7 +8,7 @@ import sys
 
 size = 14
 vmin = 0.5
-Nk=10
+Nk=8
 k   = np.arange(Nk)
 kt = 2.2
 ki = int(kt)
@@ -21,7 +21,7 @@ Si[ki+1] =    a
 ht  = 0.05
 hdv = 0.19
 
-fig = plt.figure(figsize=(10,3.5))
+fig = plt.figure(figsize=(8,3.5))
 
 p0  = plt.bar(k,Si,width=1.0,fc='cornsilk',ec='k')
 p1, = plt.plot([ki+t,ki+t],[0,1],'r-')
@@ -49,7 +49,7 @@ plt.xticks( [0,1,ki,ki+t,ki+1,Nk-1],
             ha='left')
 ax=  plt.gca()
 plt.xlim(vmin,Nk-0.5)
-plt.subplots_adjust(left=0.085,right=0.950,top=0.910,bottom=0.175)
+plt.subplots_adjust(left=0.1,right=0.950,top=0.910,bottom=0.175)
 ##plt.subplots_adjust(left=0.15,right=0.9,top=0.9,bottom=0.3)
 ##
 ##axslider = plt.axes([0.15, 0.1, 0.70, 0.03], facecolor='cornsilk')
