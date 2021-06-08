@@ -27,12 +27,12 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized):
     np.add.at(S_klm, (ki1, li1, mi1), S0i *    avi  *    aGi  *    aLi )
     return S_klm
 
-def calc_gV_FT(x,wG,wL):
+def calc_gV_FT(x, wG, wL):
     gG_FT = np.exp(-(np.pi*x*wG)**2/(4*np.log(2)))
     gL_FT = np.exp(- np.pi*x*wL)
     return gG_FT * gL_FT
 
-def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
+def apply_transform(v, log_wG, log_wL, S_klm, folding_thresh):
     dv     = (v[-1] - v[0]) / (v.size - 1)
     x      = np.fft.rfftfreq(2 * v.size, dv)
     S_k_FT = np.zeros(v.size + 1, dtype = np.complex64)
@@ -48,7 +48,7 @@ def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
     return np.fft.irfft(S_k_FT)[:v.size] / dv
 
 def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, 
-                        optimized = False, folding_thresh = 1e-6):
+                        folding_thresh = 1e-6):
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
     v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
     log_wG = init_w_axis(dxG,log_wGi) #Eq 3.8
