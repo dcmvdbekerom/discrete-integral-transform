@@ -15,7 +15,7 @@ def get_indices(arr_i, axis):
     return index, index + 1, pos - index 
 
 
-def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized):
+def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size))
     ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
     li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
@@ -66,6 +66,6 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2,
     v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
     log_wG = init_w_axis(dxG,log_wGi) #Eq 3.8
     log_wL = init_w_axis(dxL,log_wLi) #Eq 3.9
-    S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized)
+    S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i)
     I = apply_transform(v, log_wG, log_wL, S_klm, folding_thresh)
     return I, S_klm
