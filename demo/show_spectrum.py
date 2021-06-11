@@ -27,11 +27,6 @@ v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
 print('{:.2f}M lines '.format(len(v0i)*1e-6))
 I0,S_klm,J = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,optimized=False)
 
-Iexp = I0 + np.random.normal(0,0.05,I0.size)
-I1,S_klm,J = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,Iexp=Iexp,dxG=dxG,dxL=dxL,optimized=False)
-
-
-plt.plot(v,Iexp,'.')
 plt.plot(v,I0,'-')
 
 plt.xlim(v_max,v_min)
