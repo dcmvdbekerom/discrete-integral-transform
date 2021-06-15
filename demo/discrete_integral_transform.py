@@ -124,82 +124,6 @@ def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
     return np.fft.irfft(S_k_FT)[:v.size] / dv
 
 
-def jacobian_integrals(v, log_wG, log_wL, Isyn, Iexp, folding_thresh = 1e-6):
-
-    dv  = (v[-1] - v[0]) / (v.size - 1)
-    x   = np.fft.rfftfreq(2 * v.size, dv)
-    dxL = (log_wL[-1] - log_wL[0])/(log_wL.size - 1)
-    fL  = np.exp(0.5 * dxL)
-    wG  = np.exp(log_wG)
-    wL  = np.exp(log_wL)
-
-    ## Note: we can't use the I_FT from earlier because the latter half
-    ## must be zeroed first to prevent circular convolution.
-    ## This adds one FT per step, which could be eliminated if
-    ## circular convolution is not an issue.
-    
-    DeltaI = np.zeros(2 * v.size)
-    DeltaI[:v.size] = Iexp - Isyn
-    DeltaI_FT = np.fft.rfft(DeltaI) * dv
-    expL = np.sum(DeltaI[:v.size]**2) * dv
-
-    IS0 = np.zeros((2 * v.size, log_wG.size, log_wL.size))
-    Iv0 = np.zeros((2 * v.size, log_wG.size, log_wL.size))
-    IwG = np.zeros((2 * v.size, log_wG.size, log_wL.size))
-    IwL = np.zeros((2 * v.size, log_wG.size, log_wL.size))
-
-    for l in range(wG.size):
-        gV_FT = calc_gV_FT(x,wG[l], wL[0] / fL, dv, folding_thresh)
-        Iconv_prev = np.fft.irfft(DeltaI_FT * gV_FT)
-
-        for m in range(wL.size):
-            gV_FT = calc_gV_FT(x, wG[l], wL[m] * fL, dv, folding_thresh)
-            Iconv_next = np.fft.irfft(DeltaI_FT * gV_FT)
-
-            ## We calculate the derivates numerically to prevent having to redo
-            ## the FT's with the exact derivatives. 
-
-            IS0[ :  ,l,m] = (Iconv_prev + Iconv_next) / 2
-            
-            Iv0[1:-1,l,m] = (IS0[2:,l,m] - IS0[:-2,l,m]) / (2*dv)
-            Iv0[0   ,l,m] = (IS0[1 ,l,m] - IS0[ -1,l,m]) / (2*dv)
-
-            IwG[1:-1,l,m] = (IS0[2:,l,m] + IS0[:-2,l,m] - 2 * IS0[1:-1,l,m]) / (8 * np.log(2) * dv**2)
-            IwG[0   ,l,m] = (IS0[1 ,l,m] + IS0[ -1,l,m] - 2 * IS0[0   ,l,m]) / (8 * np.log(2) * dv**2)
-
-            IwL[ :  ,l,m] = (Iconv_next - Iconv_prev) / (wL[m] * dxL)
-
-            Iconv_prev = Iconv_next            
-
-    return expL, IS0, Iv0, IwG, IwL
-
-
-def calc_jacobian(integrals, indices, intensities, S0i, wGi):
-
-    expL,IS0,Iv0,IwG,IwL = integrals
-
-    int_DS0 = np.zeros(S0i.size)
-    int_Dv0 = np.zeros(S0i.size)
-    int_DwG = np.zeros(S0i.size)
-    int_DwL = np.zeros(S0i.size)
-
-    for klm, I in zip(indices, intensities):
-        int_DS0 += I * IS0[klm]
-        int_Dv0 += I * Iv0[klm]
-        int_DwG += I * IwG[klm]
-        int_DwL += I * IwL[klm]
-
-    int_DS0 /= S0i
-    int_DwG *= wGi
-    
-    dLdS0 = -2 * int_DS0 / expL
-    dLdv0 = -2 * int_Dv0 / expL
-    dLdwG = -2 * int_DwG / expL
-    dLdwL = -2 * int_DwL / expL
-    
-    return dLdS0, dLdv0, dLdwG, dLdwL
-    
-
 ## Synthesize spectrum:
 def synthesize_spectrum(v,
                         v0i, log_wGi, log_wLi, S0i,
@@ -222,15 +146,6 @@ def synthesize_spectrum(v,
     I = apply_transform(v, log_wG, log_wL, S_klm, folding_thresh)
     print('{:.3f}s Spectrum'.format(perf_counter() - t0))
 
-        # Calculate Jacobian:
-    if type(Iexp) == type(None):
-        J = tuple(4*[np.zeros(S0i.size)])
-    else:
-        t1 = perf_counter()
-        integrals = jacobian_integrals(v, log_wG, log_wL, I, Iexp)
-        J = calc_jacobian(integrals, indices, intensities, S0i, np.exp(log_wGi))
-        print('{:.3f}s Jacobian'.format(perf_counter() - t1))
-    
-    return I, S_klm, J
+    return I, S_klm
 
 
