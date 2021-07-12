@@ -1,6 +1,7 @@
 from HITEMP_spectra import init_database, calc_stick_spectrum
 from discrete_integral_transform import synthesize_spectrum
 from discrete_integral_transform_log import synthesize_spectrum as synthesize_spectrum_log
+from scipy.interpolate import CubicSpline
 ##from dit_log import synthesize_spectrum as synthesize_spectrum_log
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,8 +20,8 @@ v_max = 2400.0 #cm-1
 dv =     0.002 #cm-1
 v_lin = np.arange(v_min,v_max,dv) #cm-1
 
-dxG = 0.1
-dxL = 0.1
+dxG = 0.01
+dxL = 0.01
 
 Nv = 100000
 dxv = 1e-6
@@ -46,8 +47,10 @@ fig,ax = plt.subplots(2,1,sharex=True)
 
 ax[0].plot(v_lin,I0_lin,'.', label='linear')
 ax[0].plot(v_log,I0_log,'.',label='log')
-ax[0].set_xlim(2305,2303)
+##ax[0].set_xlim(2305,2303)
 ax[0].legend()
 
-ax[1].plot(v_log, I0_log - np.interp(v_log,v_lin,I0_lin),label='log - linear (intp.)')
+cs = CubicSpline(v_lin,I0_lin)
+idx = v_log < v_max
+ax[1].plot(v_log[idx], I0_log[idx] - cs(v_log[idx]),label='log - linear (intp.)')
 plt.show()
