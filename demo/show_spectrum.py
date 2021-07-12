@@ -1,10 +1,11 @@
 from HITEMP_spectra import init_database, calc_stick_spectrum
 from discrete_integral_transform import synthesize_spectrum
 from discrete_integral_transform_log import synthesize_spectrum as synthesize_spectrum_log
+##from dit_log import synthesize_spectrum as synthesize_spectrum_log
 import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
-
+import sys
 
 ## Download database files from https://hitran.org/hitemp/
 
@@ -27,6 +28,9 @@ dxv = 1e-7
 T = 1000.0 #K
 p =    0.1 #bar
 
+log_v = np.log(v_min) + np.arange(Nv) * dxv
+v_log = np.exp(log_v)
+
 #calculate line params
 v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
 log_v0i = np.log(v0i)
@@ -36,17 +40,13 @@ print('{:.2f}M lines '.format(len(v0i)*1e-6))
 I0_lin, S_klm_lin = synthesize_spectrum(v_lin,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,optimized=False)
 
 # log v-grid:
-log_v, I0_log, S_klm_log = synthesize_spectrum_log(log_v0i,log_wGi,log_wLi,S0i,
-                                        np.log(v_min), Nv, dxv,
-                                        dxG=dxG,dxL=dxL)
-v_log = np.exp(log_v)
-
+I0_log, S_klm_lin = synthesize_spectrum_log(v_log,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL)
 
 fig,ax = plt.subplots(2,1,sharex=True)
 
 ax[0].plot(v_lin,I0_lin,'-', label='linear')
 ax[0].plot(v_log,I0_log,'--',label='log')
-ax[0].set_xlim(v_max,v_min)
+ax[0].set_xlim(2305,2303)
 ax[0].legend()
 
 ax[1].plot(v_log, I0_log - np.interp(v_log,v_lin,I0_lin),label='log - linear (intp.)')
