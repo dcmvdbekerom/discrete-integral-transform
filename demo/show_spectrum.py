@@ -16,14 +16,14 @@ init_database([HITEMP_path + "02_2000-2125_HITEMP2010.par",
 
 v_min = 2200.0 #cm-1
 v_max = 2400.0 #cm-1
-dv =     0.0002 #cm-1
+dv =     0.002 #cm-1
 v_lin = np.arange(v_min,v_max,dv) #cm-1
 
-dxG = 0.2
-dxL = 0.2
+dxG = 0.1
+dxL = 0.1
 
-Nv = 1000000
-dxv = 1e-7
+Nv = 100000
+dxv = 1e-6
 
 T = 1000.0 #K
 p =    0.1 #bar
@@ -44,8 +44,8 @@ I0_log, S_klm_lin = synthesize_spectrum_log(v_log,v0i,log_wGi,log_wLi,S0i,dxG=dx
 
 fig,ax = plt.subplots(2,1,sharex=True)
 
-ax[0].plot(v_lin,I0_lin,'-', label='linear')
-ax[0].plot(v_log,I0_log,'--',label='log')
+ax[0].plot(v_lin,I0_lin,'.', label='linear')
+ax[0].plot(v_log,I0_log,'.',label='log')
 ax[0].set_xlim(2305,2303)
 ax[0].legend()
 
