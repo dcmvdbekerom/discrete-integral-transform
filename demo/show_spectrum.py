@@ -25,14 +25,21 @@ T = 1000.0 #K
 p =    0.1 #bar
 
 v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
+log_v0i = np.log(v0i)
+
 print('{:.2f}M lines '.format(len(v0i)*1e-6))
 I0, S_klm = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,optimized=False)
 
 plt.plot(v,I0,'-')
 
-I0_2, S_klm_2 = synthesize_spectrum_log(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL)
+Nv = 100000
+dxv = 1e-6
 
-plt.plot(v,I0_2,'--')
+log_v, I0_2, S_klm_2 = synthesize_spectrum_log(log_v0i,log_wGi,log_wLi,S0i,
+                                        np.log(v_min), Nv, dxv,
+                                        dxG=dxG,dxL=dxL)
+
+plt.plot(np.exp(log_v),I0_2,'--')
 
 plt.xlim(v_max,v_min)
 plt.grid(True,alpha=0.2)
