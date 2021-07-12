@@ -1,5 +1,6 @@
 from HITEMP_spectra import init_database, calc_stick_spectrum
 from discrete_integral_transform import synthesize_spectrum
+from discrete_integral_transform_log import synthesize_spectrum as synthesize_spectrum_log
 import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
@@ -28,6 +29,10 @@ print('{:.2f}M lines '.format(len(v0i)*1e-6))
 I0, S_klm = synthesize_spectrum(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,optimized=False)
 
 plt.plot(v,I0,'-')
+
+I0_2, S_klm_2 = synthesize_spectrum_log(v,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL)
+
+plt.plot(v,I0_2,'--')
 
 plt.xlim(v_max,v_min)
 plt.grid(True,alpha=0.2)
