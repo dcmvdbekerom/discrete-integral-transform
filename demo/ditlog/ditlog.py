@@ -40,7 +40,7 @@ def calc_gV_FT(x, wL, folding_thresh):
     while gV_FT(n/2,wL) >= folding_thresh:
         result += gV_FT(n/2 + x_fold[n&1], wL)
         n += 1
-
+    result /= result[0]
     return result
 
 
@@ -62,10 +62,12 @@ def synthesize_spectrum(v, v0i, log_wLi, S0i, dxv, dxL = 0.2,
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
     v0i, log_wLi, S0i = v0i[idx], log_wLi[idx], S0i[idx]
 
-    log_dvi = np.log(v0i * dxv)
+##    log_dvi = np.log(v0i * dxv)
+    log_dvi = np.interp(v0i, v[1:-1], np.log(0.5*(v[2:] - v[:-2])))
     log_wL = init_w_axis(dxL, log_wLi - log_dvi) #pts
     
     S_klm = calc_matrix(v, log_wL, v0i, log_wLi - log_dvi, S0i, zero_pad)
-    dv = v*dxv
+##    dv = v*dxv
+    dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2]))
     I = apply_transform(v.size, log_wL, S_klm, folding_thresh) / dv
     return I
