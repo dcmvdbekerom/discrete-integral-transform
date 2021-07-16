@@ -55,14 +55,6 @@ def apply_transform(Nv, log_wL, S_klm, folding_thresh):
     return np.fft.irfft(S_k_FT)[:Nv]
 
 
-# Call I = synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i) to synthesize the spectrum.
-# v = spectral axis (in cm-1)
-# v0i = list/array with spectral position of lines
-# log_wGi = list/array with log of the Gaussian widths of lines [= np.log(wGi)]
-# log_wLi = list/array with log of the Lorentzian widths of lines [= np.log(wLi)]
-# S0i = list/array with the linestrengths of lines (E.g. absorbances, emissivities, etc., depending the spectrum being synthesized)
-
-
 def synthesize_spectrum(v, v0i, log_wLi, S0i, dxv, dxL = 0.2,
                         zero_pad = 2,
                         folding_thresh = 1e-12):
