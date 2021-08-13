@@ -17,11 +17,11 @@ init_database([HITEMP_path + "02_2000-2125_HITEMP2010.par",
 
 v_min = 2200.0 #cm-1
 v_max = 2400.0 #cm-1
-dv =     0.002 #cm-1
+dv =     0.0002 #cm-1
 v_lin = np.arange(v_min,v_max,dv) #cm-1
 
-dxG = 0.01
-dxL = 0.01
+dxG = 0.1
+dxL = 0.1
 
 Nv = 100000
 dxv = 1e-6
@@ -41,13 +41,13 @@ print('{:.2f}M lines '.format(len(v0i)*1e-6))
 I0_lin, S_klm_lin = synthesize_spectrum(v_lin,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL,optimized=False)
 
 # log v-grid:
-I0_log, S_klm_lin = synthesize_spectrum_log(v_log,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL)
+I0_log, S_klm_log = synthesize_spectrum_log(v_log,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL)
 
 fig,ax = plt.subplots(2,1,sharex=True)
 
-ax[0].plot(v_lin,I0_lin,'.', label='linear')
+ax[0].plot(v_lin,I0_lin,'-', label='linear')
 ax[0].plot(v_log,I0_log,'.',label='log')
-##ax[0].set_xlim(2305,2303)
+ax[0].set_xlim(2305,2303)
 ax[0].legend()
 
 cs = CubicSpline(v_lin,I0_lin)

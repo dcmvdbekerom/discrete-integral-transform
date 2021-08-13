@@ -40,7 +40,7 @@ def calc_gV_FT(x, wL, folding_thresh):
     while gV_FT(n/2,wL) >= folding_thresh:
         result += gV_FT(n/2 + x_fold[n&1], wL)
         n += 1
-    result /= result[0]
+##    result /= result[0]
     return result
 
 

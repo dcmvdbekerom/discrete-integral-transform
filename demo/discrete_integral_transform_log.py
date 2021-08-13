@@ -75,6 +75,11 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2,
     v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
 
     log_dvi = np.interp(v0i, v[1:-1], np.log(0.5*(v[2:] - v[:-2])))
+
+    
+    log_wG_dat = np.log(2) + np.log(v0) + 0.5*np.log(2*k*np.log(2)/(c**2*Mm)) + hlog_T #minmax can be determined at init
+    
+    
     log_wG = init_w_axis(dxG, log_wGi - log_dvi) #pts
     log_wL = init_w_axis(dxL, log_wLi - log_dvi) #pts
     
