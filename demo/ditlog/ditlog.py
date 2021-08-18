@@ -69,5 +69,5 @@ def synthesize_spectrum(v, v0i, log_wLi, S0i, dxv, dxL = 0.2,
     S_klm = calc_matrix(v, log_wL, v0i, log_wLi - log_dvi, S0i, zero_pad)
 ##    dv = v*dxv
     dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2]))
-    I = apply_transform(v.size, log_wL, S_klm, folding_thresh) / dv
+    I = apply_transform(v.size, v, log_wL, S_klm, folding_thresh) / dv
     return I
