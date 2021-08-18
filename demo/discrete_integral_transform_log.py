@@ -74,16 +74,16 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2,
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
     v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
 
-    log_dvi = np.interp(v0i, v[1:-1], np.log(0.5*(v[2:] - v[:-2])))
-
-    
-    log_wG_dat = np.log(2) + np.log(v0) + 0.5*np.log(2*k*np.log(2)/(c**2*Mm)) + hlog_T #minmax can be determined at init
-    
+    log_dvi = np.interp(v0i, v[1:-1], np.log(0.5*(v[2:] - v[:-2])))  # General
+##    log_dvi = np.log(v0i * dxv) # log-grid
     
     log_wG = init_w_axis(dxG, log_wGi - log_dvi) #pts
     log_wL = init_w_axis(dxL, log_wLi - log_dvi) #pts
     
     S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi - log_dvi, log_wLi - log_dvi, S0i)
-    dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2]))
+    
+    dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2])) # General
+##    dv = v*dxv # log-grid
+    
     I = apply_transform(v.size, log_wG, log_wL, S_klm, folding_thresh) / dv
     return I, S_klm
