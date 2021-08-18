@@ -35,7 +35,7 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     return S_klm
 
 
-
+gE_FT = lambda x,w: 1 / (1 + 4*pi**2*x**2*w**2)
 gL_FT = lambda x,w: np.exp(-np.abs(x)*pi*w)
 gG_FT = lambda x,w: np.exp(-(x*pi*w)**2/(4*log(2)))
 gV_FT = lambda x,wG,wL: gG_FT(x,wG) + gL_FT(x,wL)
