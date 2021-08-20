@@ -126,7 +126,13 @@ def gL_FT_corr(x_arr, wL):
     I_corr[0] += 2*B_corr
     I_corr[1::2] *= -1
 
-    result -= I_corr
+##    result -= I_corr
+
+    I_corr2 = np.sum(np.array([2*np.cos(4*k*pi*x_arr*vmax) for k in range(30)]),0)
+    plt.plot(x_arr,I_corr2)
+    plt.show()
+    print(I_corr2.shape)
+    result *= I_corr2
 
     return result
 
@@ -177,13 +183,19 @@ IL_FT_corr[0] += 2*B_corr
 
 IL_FT_corr[1::2] *= -1
 IL_FT -= IL_FT_corr
+
+##IL_FT *= IL_FT_corr2
+
+
+
+
 IL_FT = gL_FT_corr(x_arr, wL)
 ##IL_FT = gL_FT_corr(x_arr*dv, wL/dv)
 IL_IDFT_corr = np.fft.irfft(IL_FT/dv)[:Nv]
 
-plt.plot(v_arr, IL_direct, 'k', lw=3)
-plt.plot(v_arr, IL_IDFT, 'r--')
-plt.plot(v_arr, IL_IDFT_corr, 'r-')
+plt.plot(v_arr, IL_direct/IL_direct[0], 'k', lw=3)
+plt.plot(v_arr, IL_IDFT/IL_IDFT[0], 'r--')
+plt.plot(v_arr, IL_IDFT_corr/IL_IDFT_corr[0], 'r-')
 plt.yscale('log')
 plt.show()
 

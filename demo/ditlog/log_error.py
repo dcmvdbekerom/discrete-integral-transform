@@ -7,7 +7,7 @@ gL  = lambda v,v0,w: 2/(pi*w) * 1 / (1 + 4*((v-v0)/w)**2)
 gG  = lambda v,v0,w: (2/w)*sqrt(log(2)/pi)*exp(-4*log(2)*((v-v0)/w)**2)
 
 dgLdv = lambda v,v0,w: -8*pi*(v-v0)/w * gL(v,v0,w)**2
-dgGdv = lambda v,v0,w: -16/w**2*(v-v0)*log(2)*gG(v,v0,w)
+dgGdv = lambda v,v0,w: -16/w**2*(v-v0)*log(2) * gG(v,v0,w)
 
 ##dgLdv = lambda v,v0,w: -32/(pi*w**2) * ((v-v0)/w)/(1+4*((v-v0)/w)**2)**2
 ##dgGdv = lambda v,v0,w: (-32/w**3)*(v-v0)*sqrt(log(2)**3/pi)*exp(-4*log(2)*((v-v0)/w)**2)
