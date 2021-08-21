@@ -1,27 +1,31 @@
 import numpy as np
-from numpy import pi, log, exp, sqrt, cosh, sinh
+from numpy import pi, log, exp, sqrt, cosh, sinh, tanh, cos, arccos
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-from numpy.fft import rfftfreq, rfft, irfft, fftshift, ifftshift 
+from numpy.fft import rfftfreq, rfft, irfft, fftshift, ifftshift
+import sys
 
 gL  = lambda v,v0,w: 2/(pi*w) * 1 / (1 + 4*((v-v0)/w)**2)
 gL_apx = lambda v,v0,w: 2/(pi*w) * 1 / (4*((v-v0)/w)**2)
 gL_int = lambda v,v0,w: -1/pi * 1 / (2*(v-v0)/w)
-dgLdv = lambda v,v0,w: -32/(pi*w**2) * ((v-v0)/w)/(1+4*((v-v0)/w)**2)**2
+dgLdv = lambda v,v0,w: -16/(pi*w**2) * ((v-v0)/w)/(1+4*((v-v0)/w)**2)**2
+gE_corr = lambda v,w,vmax: (exp((v-vmax)/w) + exp((-v-vmax)/w))/(2*w)
+gE = lambda v,w,vmax: exp((v-vmax)/w)
+fitfun = lambda v,A,B,w: A*gE_corr(v,w,vmax) + B/vmax
 
 
 Nv = 1000
-vmax = 10
+vmax = 10000
 dv = vmax/Nv
 
 k_arr = np.arange(Nv)
 v_arr = np.arange(Nv)*dv
 x = rfftfreq(2 * Nv, 1)
 
-wL = 3.4530
+wL = 1.0
 
 
-L = 100
+L = 10000
 
 IL_err = np.zeros(Nv)
 for n in range(1,L):
@@ -29,21 +33,52 @@ for n in range(1,L):
     IL_err += gL(v_arr,-2*vmax*n,wL)
 
 
-Ic0_arr = 2*gL(0,2*k_arr*vmax,wL)
-Ic1_arr = gL(vmax,2*k_arr*vmax,wL)+gL(vmax,-2*k_arr*vmax,wL)
-dIc1dv_arr = dgLdv(vmax,2*k_arr*vmax,wL)+dgLdv(vmax,-2*k_arr*vmax,wL)
+IL_apx = np.zeros(Nv)
+for n in range(1,L):
+    IL_apx += gL_apx(v_arr,2*vmax*n,wL)
+    IL_apx += gL_apx(v_arr,-2*vmax*n,wL)
+    
 
-Ic0 = np.sum(Ic0_arr[1:])
-Ic1 = np.sum(Ic1_arr[1:])
-dIc1dv = np.sum(dIc1dv_arr[1:])
+f_0 = wL*pi/(24*vmax**2)
+f_vmax = wL/(2*pi*vmax**2)*(pi**2/4-1)
+dfdv_vmax = wL/(pi*vmax**3)
+
+##t_arr = np.arange(0,10,0.01)
+##rt_tanht = tanh(t_arr)/t_arr
+##apx1 = 1+2*(cos(t_arr)-1)/3
+##
+##plt.plot(t_arr,rt_tanht)
+##plt.plot(t_arr,apx1)
+##plt.show()
+##sys.exit()
+
+C = (f_vmax - f_0)/(dfdv_vmax * vmax)
+t_old = 1/C
+for i in range(10):
+    t_new = tanh(t_old)/C
+    print(t_new)
+    if np.abs(t_new/t_old) < 1e-6:
+        break
+    t_old = t_new
+
+wc = arccos((wc0-1)*3/2+1)
+Ac = 2*wc**2*dfdv_vmax
+Bc = (f_vmax - wc*dfdv_vmax)*vmax
+
+plt.plot(v_arr,IL_err,'k',lw=3,label='direct')
+plt.plot(v_arr,IL_apx,'r',lw=1,label='approx')
+
+plt.plot([0,vmax],[f_0,f_vmax],'bo',label='exact')
+plt.plot(v_arr,(v_arr - vmax) * dfdv_vmax + f_vmax,'b--')
+
+
+plt.plot(v_arr,fitfun(v_arr,Ac,Bc,wc),'g-.',label='fit')
+
+plt.legend()
+plt.show()
 
 
 
-IL_err0 = wL*pi/(24*vmax**2)
-IL_err1 = wL/(2*pi*vmax**2)*(pi**2/4-1)
-IL_err2 = 2*wL/(pi*vmax**3)
 
-
-gE_corr = lambda v,w,vmax: (exp((v-2*vmax)/w) + exp(-v/w))/(2*w)
 
 
