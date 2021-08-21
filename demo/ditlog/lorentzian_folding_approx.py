@@ -52,18 +52,18 @@ dfdv_vmax = wL/(pi*vmax**3)
 ##plt.show()
 ##sys.exit()
 
-C = (f_vmax - f_0)/(dfdv_vmax * vmax)
-t_old = 1/C
+q0 = (f_vmax - f_0)/(dfdv_vmax*vmax)
+q_old = q0
 for i in range(10):
-    t_new = tanh(t_old)/C
-    print(t_new)
-    if np.abs(t_new/t_old) < 1e-6:
+    q_new = q0/tanh(1/(2*q_old))
+    print(q_old)
+    if not np.abs(q_new - q_old):
         break
-    t_old = t_new
+    q_old = q_new
 
-wc = arccos((wc0-1)*3/2+1)
-Ac = 2*wc**2*dfdv_vmax
-Bc = (f_vmax - wc*dfdv_vmax)*vmax
+wc = q_new * vmax
+Ac = 2*wc**2*dfdv_vmax/(1-exp(-2*vmax/wc))
+Bc = (f_0 - Ac*exp(-vmax/wc)/wc)*vmax
 
 plt.plot(v_arr,IL_err,'k',lw=3,label='direct')
 plt.plot(v_arr,IL_apx,'r',lw=1,label='approx')
