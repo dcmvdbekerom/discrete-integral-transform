@@ -20,6 +20,7 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
     li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
     mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
+    
     np.add.at(S_klm, (ki0, li0, mi0), S0i * (1-avi) * (1-aGi) * (1-aLi))
     np.add.at(S_klm, (ki0, li0, mi1), S0i * (1-avi) * (1-aGi) *    aLi )
     np.add.at(S_klm, (ki0, li1, mi0), S0i * (1-avi) *    aGi  * (1-aLi))

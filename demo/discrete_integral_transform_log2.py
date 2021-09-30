@@ -1,5 +1,7 @@
 import numpy as np
 
+## Same as discrete_integral_transform_log.py but includes
+## correction for asymmetry
 
 def init_w_axis(dx, log_wi):
     log_w_min = np.min(log_wi)
@@ -79,15 +81,27 @@ def calc_gV_FT(x, wG, wL, folding_thresh):
     return result
 
 
-def apply_transform(Nv, log_wG, log_wL, S_klm, folding_thresh):
-    x      = np.fft.rfftfreq(2 * Nv, 1)
-    S_k_FT = np.zeros(Nv + 1, dtype = np.complex64)
+def apply_transform(v, log_wG, log_wL, S_klm, folding_thresh):
+    Nv = v.size
+    x = np.fft.rfftfreq(2 * Nv, 1)
+    S_k_FT_re = np.zeros(Nv + 1, dtype = np.complex64)
+    Sv_k_FT_im = np.zeros(Nv + 1, dtype = np.complex64)
     for l in range(log_wG.size):
         for m in range(log_wL.size):
             wG_l,wL_m = np.exp(log_wG[l]),np.exp(log_wL[m])
-            gV_FT = calc_gV_FT(x, wG_l, wL_m, folding_thresh)    
-            S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
-    return np.fft.irfft(S_k_FT)[:Nv]
+            gV_FT = calc_gV_FT(x, wG_l, wL_m, folding_thresh)
+            
+            S_klm_FT = np.fft.rfft(S_klm[:,l,m]) * gV_FT
+            S_k_FT_re += S_klm_FT
+
+            WGx = (pi*wG*x)**2/(4*log(2))
+            WLx = pi*wL*x
+            S_klm_FT *= (-2*WGx**2 + 3*WGx - 2*WGx*WLx - 0.5*WLx**2 + WLx)
+            Sv_k_FT_im += 1j/(2*pi*x) * S_klm_FT
+            
+    S_sym = np.fft.irfft(S_k_FT_re)[:Nv]
+    S_asym = np.fft.irfft(Sv_k_FT_im)[:Nv] / v
+    return S_sym, S_asym
 
 
 # Call I = synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i) to synthesize the spectrum.
@@ -115,6 +129,6 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2,
     dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2])) # General
 ##    dv = v*dxv # log-grid
     
-    I = apply_transform(v.size, log_wG, log_wL, S_klm, folding_thresh) / dv
-    return I, S_klm
+    I_sym, I_asym = apply_transform(v, log_wG, log_wL, S_klm, folding_thresh) / dv
+    return I_sym + I_asym, S_klm
 
