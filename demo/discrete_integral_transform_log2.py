@@ -67,7 +67,7 @@ def gL_FT_corr(x_arr, wL):
 
     return result
 
-gV_FT_corr = lambda x,wG,wL: gG_FT(x,wG) + gL_FT_corr(x,wL)
+gV_FT_corr = lambda x,wG,wL: gG_FT(x,wG) * gL_FT_corr(x,wL)
 
 
 def calc_gV_FT(x, wG, wL, folding_thresh):
