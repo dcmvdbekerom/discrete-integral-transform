@@ -79,15 +79,30 @@ def calc_gV_FT(x, wG, wL, folding_thresh):
     return result
 
 
-def apply_transform(Nv, log_wG, log_wL, S_klm, folding_thresh):
-    x      = np.fft.rfftfreq(2 * Nv, 1)
-    S_k_FT = np.zeros(Nv + 1, dtype = np.complex64)
+def apply_transform(v, log_wG, log_wL, S_klm, folding_thresh):
+    Nv = v.size
+    x = np.fft.rfftfreq(2 * Nv, 1)
+    S_k_FT_re = np.zeros(Nv + 1, dtype = np.complex64)
+    Sv_k_FT_im = np.zeros(Nv + 1, dtype = np.complex64)
     for l in range(log_wG.size):
         for m in range(log_wL.size):
             wG_l,wL_m = np.exp(log_wG[l]),np.exp(log_wL[m])
-            gV_FT = calc_gV_FT(x, wG_l, wL_m, folding_thresh)    
-            S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
-    return np.fft.irfft(S_k_FT)[:Nv]
+            gV_FT = calc_gV_FT(x, wG_l, wL_m, folding_thresh)
+            
+            S_klm_FT = np.fft.rfft(S_klm[:,l,m]) * gV_FT
+            S_k_FT_re += S_klm_FT
+
+            if log_correction:
+                WGx = (pi*wG*x)**2/(4*log(2))
+                WLx = pi*wL*x
+                S_klm_FT *= (-2*WGx**2 + 3*WGx - 2*WGx*WLx - 0.5*WLx**2 + WLx)
+                Sv_k_FT_im += 1j/(2*pi*x) * S_klm_FT
+            
+    S_k = np.fft.irfft(S_k_FT_re)[:Nv]
+    if log_correction:
+        S_k += np.fft.irfft(Sv_k_FT_im)[:Nv] / v
+        
+    return S_k
 
 
 # Call I = synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i) to synthesize the spectrum.
@@ -99,13 +114,13 @@ def apply_transform(Nv, log_wG, log_wL, S_klm, folding_thresh):
 
 
 def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2, 
-                        folding_thresh = 1e-6):
+                        folding_thresh = 1e-6, log_correction=False):
         
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
     v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
 
     log_dvi = np.interp(v0i, v[1:-1], np.log(0.5*(v[2:] - v[:-2])))  # General
-##    log_dvi = np.log(v0i * dxv) # log-grid
+    #log_dvi = np.log(v0i * dxv) # log-grid
     
     log_wG = init_w_axis(dxG, log_wGi - log_dvi) #pts
     log_wL = init_w_axis(dxL, log_wLi - log_dvi) #pts
@@ -113,8 +128,9 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2,
     S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi - log_dvi, log_wLi - log_dvi, S0i)
     
     dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2])) # General
-##    dv = v*dxv # log-grid
+    #dv = v*dxv # log-grid
     
-    I = apply_transform(v.size, log_wG, log_wL, S_klm, folding_thresh) / dv
+    I = apply_transform(v.size, log_wG, log_wL, S_klm,
+                        folding_thresh, log_correction) / dv
     return I, S_klm
 
