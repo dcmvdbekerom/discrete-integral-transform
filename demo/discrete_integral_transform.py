@@ -1,11 +1,12 @@
 import numpy as np
 from time import perf_counter
+from numpy import pi,log
 
 ## Define constants for optimized weights (Eq 3.20 & Table 1):
-C1_GG = ((6 * np.pi - 16) / (15 * np.pi - 32)) ** (1 / 1.50)
-C1_LG = ((6 * np.pi - 16) / 3 * (np.log(2) / (2 * np.pi)) ** 0.5) ** (1 / 2.25)
-C2_GG = (2 * np.log(2) / 15) ** (1 / 1.50)
-C2_LG = ((2 * np.log(2)) ** 2 / 15) ** (1 / 2.25)
+C1_GG = ((6 * pi - 16) / (15 * pi - 32)) ** (1 / 1.50)
+C1_LG = ((6 * pi - 16) / 3 * (log(2) / (2 * pi)) ** 0.5) ** (1 / 2.25)
+C2_GG = (2 * log(2) / 15) ** (1 / 1.50)
+C2_LG = ((2 * log(2)) ** 2 / 15) ** (1 / 2.25)
 
 
 ## Prepare width-axes based on number of gridpoints and linewidth data:
@@ -46,9 +47,9 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized):
 
         alpha_i = np.exp(log_wLi - log_wGi)
 
-        R_Gv = 8 * np.log(2)
+        R_Gv = 8 * log(2)
         R_GG = 2 - 1 / (C1_GG + C2_GG * alpha_i ** (2 / 1.50)) ** 1.50
-        R_GL = -2 * np.log(2) * alpha_i ** 2
+        R_GL = -2 * log(2) * alpha_i ** 2
 
         R_LL = 1
         R_LG = 1 / (C1_LG * alpha_i ** (1 / 2.25) + C2_LG * alpha_i ** (4 / 2.25)) ** 2.25
@@ -93,15 +94,45 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, optimized):
     return S_klm, indices, intensities
 
 
-def calc_gV_FT(x,wG,wL,dv,folding_thresh):
+gE_FT = lambda x,w: 1 / (1 + 4*pi**2*x**2*w**2)
+gL_FT = lambda x,w: np.exp(-np.abs(x)*pi*w)
+gG_FT = lambda x,w: np.exp(-(x*pi*w)**2/(4*log(2)))
+gV_FT = lambda x,wG,wL: gG_FT(x,wG) * gL_FT(x,wL)
 
-    gV_FT = lambda x,wG,wL: np.exp(-((np.pi*x*wG)**2/(4*np.log(2)) + np.pi*x*wL))
-    x_fold = (x,x[::-1])
+coeff_w = [0.39560962,-0.19461568]
+coeff_A = [0.09432246, 0.06592025]
+coeff_B = [0.11202818, 0.09048447]
+
+corr_fun = lambda x,c0,c1: c0 * np.exp(-c1*x**2)
+
+def gL_FT_corr(x_arr, wL):
+
+    result = gL_FT(x_arr, wL)
+
+    vmax = 1/(2*x_arr[1])
+    q = wL/vmax
     
-    result = gV_FT(x,wG,wL)
+    w_corr = corr_fun(q, *coeff_w)*vmax
+    A_corr = corr_fun(q, *coeff_A)*q
+    B_corr = corr_fun(q, *coeff_B)*q
+
+    I_corr = A_corr * gE_FT(x_arr, w_corr)
+    I_corr[0] += 2*B_corr
+    I_corr[1::2] *= -1
+
+    result -= I_corr
+
+    return result
+
+gV_FT_corr = lambda x,wG,wL: gG_FT(x,wG) * gL_FT_corr(x,wL)
+
+
+def calc_gV_FT(x, wG, wL, dv, folding_thresh):
+
+    result = gV_FT_corr(x,wG,wL)
     n = 1
     while gV_FT(n/(2*dv),wG,wL) >= folding_thresh:
-        result += gV_FT(n/(2*dv) + x_fold[n&1],wG,wL)
+        result += gV_FT(n/(2*dv) + x[::1-2*(n&1)], wG, wL)
         n += 1
 
     return result
@@ -110,8 +141,8 @@ def calc_gV_FT(x,wG,wL,dv,folding_thresh):
 ## Apply transform:
 def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
 
-    dv     = (v[-1] - v[0]) / (v.size - 1)
-    x      = np.fft.rfftfreq(2 * v.size, dv)
+    dv = (v[-1] - v[0]) / (v.size - 1)
+    x  = np.fft.rfftfreq(2 * v.size, dv)
 
     # Sum over lineshape distribution matrix -- Eqs 3.2 & 3.3:
     S_k_FT = np.zeros(v.size + 1, dtype = np.complex64)
@@ -128,7 +159,6 @@ def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
 def synthesize_spectrum(v,
                         v0i, log_wGi, log_wLi, S0i,
                         dxG = 0.14, dxL = 0.2,
-                        Iexp = None,
                         optimized = False, folding_thresh = 1e-6):
 
     t0 = perf_counter()

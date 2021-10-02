@@ -1,5 +1,5 @@
 import numpy as np
-
+from numpy import pi, log
 
 def init_w_axis(dx, log_wi):
     log_w_min = np.min(log_wi)
@@ -71,15 +71,16 @@ gV_FT_corr = lambda x,wG,wL: gG_FT(x,wG) * gL_FT_corr(x,wL)
 def calc_gV_FT(x, wG, wL, folding_thresh):
     
     result = gV_FT_corr(x, wG, wL)
+    dv = 1/(2*x[-1])
     n = 1
-    while gV_FT(n/2,wG,wL) >= folding_thresh:
-        result += gV_FT(n/2 + x[::1-2*(n&1)], wG, wL)
+    while gV_FT(n/(2*dv),wG,wL) >= folding_thresh:
+        result += gV_FT(n/(2*dv) + x[::1-2*(n&1)], wG, wL)
         n += 1
 
     return result
 
 
-def apply_transform(v, log_wG, log_wL, S_klm, folding_thresh):
+def apply_transform(v, log_wG, log_wL, S_klm, folding_thresh, log_correction):
     Nv = v.size
     x = np.fft.rfftfreq(2 * Nv, 1)
     S_k_FT_re = np.zeros(Nv + 1, dtype = np.complex64)
@@ -93,13 +94,14 @@ def apply_transform(v, log_wG, log_wL, S_klm, folding_thresh):
             S_k_FT_re += S_klm_FT
 
             if log_correction:
-                WGx = (pi*wG*x)**2/(4*log(2))
-                WLx = pi*wL*x
+                WGx = (pi*wG_l*x)**2/(4*log(2))
+                WLx = pi*wL_m*x
                 S_klm_FT *= (-2*WGx**2 + 3*WGx - 2*WGx*WLx - 0.5*WLx**2 + WLx)
                 Sv_k_FT_im += 1j/(2*pi*x) * S_klm_FT
             
     S_k = np.fft.irfft(S_k_FT_re)[:Nv]
     if log_correction:
+        Sv_k_FT_im[0] = 0
         S_k += np.fft.irfft(Sv_k_FT_im)[:Nv] / v
         
     return S_k
@@ -130,7 +132,7 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2,
     dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2])) # General
     #dv = v*dxv # log-grid
     
-    I = apply_transform(v.size, log_wG, log_wL, S_klm,
+    I = apply_transform(v, log_wG, log_wL, S_klm,
                         folding_thresh, log_correction) / dv
     return I, S_klm
 
