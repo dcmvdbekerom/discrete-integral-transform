@@ -23,14 +23,15 @@ dxL = 0.1
 
 #calculate line params
 v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
+
 print('{:.2f}M lines '.format(len(v0i)*1e-6))
 
 
 #init v-grids:
 
-v_min = 2200.0 #cm-1
-v_max = 2400.0 #cm-1
-dv = 0.001 #cm-1
+v_min = 2304.3 #cm-1
+v_max = 2305.3 #cm-1
+dv = 0.0001 #cm-1
 v_lin = np.arange(v_min,v_max,dv)
 
 R = v_max/dv
@@ -50,6 +51,12 @@ I_log, S_klm = synthesize_spectrum_log(v_log,
 
 
 I_loglin = CubicSpline(v_log, I_log)(v_lin)
+
+##plt.plot(v_lin,I_lin,'.-',label='lin')
+##plt.plot(v_log,I_log,'.-',label='log')
+##plt.plot(v_lin,I_loglin,'.-',label='loglin')
+##
+
 plt.plot(v_lin,I_loglin - I_lin)
 
 plt.xlim(v_max,v_min)
