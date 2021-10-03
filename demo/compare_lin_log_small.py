@@ -37,55 +37,20 @@ R = v_max/dv
 Nv_log = int(np.log(v_max/v_min)*R)
 v_log = v_min * np.exp(np.arange(Nv_log) / R)
 
-# The log-version should also be compatible with linear inputs.
-# Let's double check whether that's the case:
-
 I_lin, S_klm = synthesize_spectrum(v_lin,
                                    v0i, log_wGi, log_wLi, S0i,
                                    dxG=dxG, dxL=dxL,
                                    optimized=False)
 
-##I_lin2, S_klm = synthesize_spectrum_log(v_lin,
-##                                        v0i, log_wGi, log_wLi, S0i,
-##                                        dxG=dxG, dxL=dxL,
-##                                        log_correction=False)
-##
-##plt.plot(v_lin,I_lin,label='I_lin')
-##plt.plot(v_lin,np.abs(I_lin-I_lin2), label='I_lin-I_lin2')
-##plt.xlim(v_max,v_min)
-##plt.yscale('log')
-##plt.legend()
-##plt.show()
-
-# Now we compare it to the log-grid:
 I_log, S_klm = synthesize_spectrum_log(v_log,
                                        v0i, log_wGi, log_wLi, S0i,
                                        dxG=dxG, dxL=dxL,
                                        log_correction=False)
 
-##plt.plot(v_lin,I_lin, label='I_lin')
-##plt.plot(v_log,I_log, label='I_log')
-##plt.xlim(v_max,v_min)
-##plt.yscale('log')
-##plt.legend()
-##plt.show()
 
-# Finally, let's see if the asymmetry correction does anything:
-
-I_log2, S_klm = synthesize_spectrum_log(v_log,
-                                        v0i, log_wGi, log_wLi, S0i,
-                                        dxG=dxG, dxL=dxL,
-                                        log_correction=True)
 
 I_loglin = CubicSpline(v_log, I_log)(v_lin)
-##plt.plot(v_lin,I_lin, '-', label='I_lin')
-##plt.plot(v_log,I_log, '-', label='I_log')
-##plt.plot(v_lin,I_loglin, '-', label='I_loglin')
-##plt.plot(v_log,I_log2, '-',label='I_log2')
-plt.plot(v_lin,I_loglin-I_lin)
-plt.plot(v_log, I_log2 - I_log)
-
-
+plt.plot(v_lin,I_loglin - I_lin)
 
 plt.xlim(v_max,v_min)
 ##plt.yscale('log')

@@ -102,9 +102,23 @@ def apply_transform(v, log_wG, log_wL, S_klm, folding_thresh, log_correction):
     S_k = np.fft.irfft(S_k_FT_re)[:Nv]
     if log_correction:
         Sv_k_FT_im[0] = 0
-        S_k += np.fft.irfft(Sv_k_FT_im)[:Nv] / v
+        dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2]))
+        S_k += np.fft.irfft(Sv_k_FT_im)[:Nv] * dv / v
         
     return S_k
+
+
+def gV(v, v0, wG, wL, log_correction=False):
+    dv0 = np.interp(v0, v[1:-1], 0.5*(v[2:] - v[:-2]))
+    S_klm = np.zeros((2 * v.size, 1, 1))
+    ki0, ki1, avi = get_indices([v0], v)
+    S_klm[ki0[0],0,0] = (1-avi[0])/dv0
+    S_klm[ki1[0],0,0] = avi[0]/dv0
+    
+    dvi = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2]))
+    return apply_transform(v,
+                           np.array([log(wG/dv0)]), np.array([log(wL/dv0)]),
+                           S_klm, 1e-6, log_correction)
 
 
 # Call I = synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i) to synthesize the spectrum.
@@ -122,17 +136,26 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i, dxG = 0.14, dxL = 0.2,
     v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
 
     log_dvi = np.interp(v0i, v[1:-1], np.log(0.5*(v[2:] - v[:-2])))  # General
-    #log_dvi = np.log(v0i * dxv) # log-grid
+    dvi = np.exp(log_dvi)
     
     log_wG = init_w_axis(dxG, log_wGi - log_dvi) #pts
     log_wL = init_w_axis(dxL, log_wLi - log_dvi) #pts
     
     S_klm = calc_matrix(v, log_wG, log_wL, v0i, log_wGi - log_dvi, log_wLi - log_dvi, S0i)
-    
-    dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2])) # General
-    #dv = v*dxv # log-grid
-    
+
+    dv = np.interp(v, v[1:-1], 0.5*(v[2:] - v[:-2]))
     I = apply_transform(v, log_wG, log_wL, S_klm,
-                        folding_thresh, log_correction) / dv
+                        folding_thresh, log_correction)/dv
     return I, S_klm
 
+
+def gV_debug(v, v0, wG, wL, folding_thresh=1e-6, log_correction=False):
+    I, S_klm = synthesize_spectrum(v,
+                                   np.array([v0]),
+                                   np.array([np.log(wG)]),
+                                   np.array([np.log(wL)]),
+                                   np.array([1.0]),
+                                   folding_thresh=folding_thresh,
+                                   log_correction=log_correction,
+                                   )
+    return I
