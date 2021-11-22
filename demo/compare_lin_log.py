@@ -82,7 +82,7 @@ I_loglin = CubicSpline(v_log, I_log)(v_lin)
 ##plt.plot(v_log,I_log, '-', label='I_log')
 ##plt.plot(v_lin,I_loglin, '-', label='I_loglin')
 ##plt.plot(v_log,I_log2, '-',label='I_log2')
-plt.plot(v_lin,I_loglin-I_lin)
+plt.plot(v_lin,I_loglin - I_lin)
 plt.plot(v_log, I_log2 - I_log)
 
 

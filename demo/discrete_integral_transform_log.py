@@ -19,18 +19,41 @@ def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     
     S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size))
 
+    R = (v.size - 1)/ np.log(np.max(v)/np.min(v))
+    log_R = np.log(R)
     ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
-    li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
-    mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
 
-    np.add.at(S_klm, (ki0, li0, mi0), S0i * (1-avi) * (1-aGi) * (1-aLi))
-    np.add.at(S_klm, (ki0, li0, mi1), S0i * (1-avi) * (1-aGi) *    aLi )
-    np.add.at(S_klm, (ki0, li1, mi0), S0i * (1-avi) *    aGi  * (1-aLi))
-    np.add.at(S_klm, (ki0, li1, mi1), S0i * (1-avi) *    aGi  *    aLi )
-    np.add.at(S_klm, (ki1, li0, mi0), S0i *    avi  * (1-aGi) * (1-aLi))
-    np.add.at(S_klm, (ki1, li0, mi1), S0i *    avi  * (1-aGi) *    aLi )
-    np.add.at(S_klm, (ki1, li1, mi0), S0i *    avi  *    aGi  * (1-aLi))
-    np.add.at(S_klm, (ki1, li1, mi1), S0i *    avi  *    aGi  *    aLi )
+    li00, li01, aGi0 = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
+    mi00, mi01, aLi0 = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
+    li10, li11, aGi1 = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
+    mi10, mi11, aLi1 = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
+
+    aGi1 *= np.exp(-avi/R)
+    aLi1 *= np.exp(-avi/R)
+    aGi0 /= np.exp(-(avi-1)/R)
+    aLi0 /= np.exp(-(avi-1)/R)
+
+    np.add.at(S_klm, (ki0, li00, mi00), S0i * (1-avi) * (1-aGi0) * (1-aLi0))
+    np.add.at(S_klm, (ki0, li00, mi01), S0i * (1-avi) * (1-aGi0) *    aLi0 )
+    np.add.at(S_klm, (ki0, li01, mi00), S0i * (1-avi) *    aGi0  * (1-aLi0))
+    np.add.at(S_klm, (ki0, li01, mi01), S0i * (1-avi) *    aGi0  *    aLi0 )
+    np.add.at(S_klm, (ki1, li10, mi10), S0i *    avi  * (1-aGi0) * (1-aLi0))
+    np.add.at(S_klm, (ki1, li10, mi11), S0i *    avi  * (1-aGi0) *    aLi0 )
+    np.add.at(S_klm, (ki1, li11, mi10), S0i *    avi  *    aGi0  * (1-aLi0))
+    np.add.at(S_klm, (ki1, li11, mi11), S0i *    avi  *    aGi0  *    aLi0 )
+
+##    ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
+##    li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
+##    mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
+##
+##    np.add.at(S_klm, (ki0, li0, mi0), S0i * (1-avi) * (1-aGi) * (1-aLi))
+##    np.add.at(S_klm, (ki0, li0, mi1), S0i * (1-avi) * (1-aGi) *    aLi )
+##    np.add.at(S_klm, (ki0, li1, mi0), S0i * (1-avi) *    aGi  * (1-aLi))
+##    np.add.at(S_klm, (ki0, li1, mi1), S0i * (1-avi) *    aGi  *    aLi )
+##    np.add.at(S_klm, (ki1, li0, mi0), S0i *    avi  * (1-aGi) * (1-aLi))
+##    np.add.at(S_klm, (ki1, li0, mi1), S0i *    avi  * (1-aGi) *    aLi )
+##    np.add.at(S_klm, (ki1, li1, mi0), S0i *    avi  *    aGi  * (1-aLi))
+##    np.add.at(S_klm, (ki1, li1, mi1), S0i *    avi  *    aGi  *    aLi )
     
     return S_klm
 
@@ -85,19 +108,21 @@ def apply_transform(v, log_wG, log_wL, S_klm, folding_thresh, log_correction):
     x = np.fft.rfftfreq(2 * Nv, 1)
     S_k_FT_re = np.zeros(Nv + 1, dtype = np.complex64)
     Sv_k_FT_im = np.zeros(Nv + 1, dtype = np.complex64)
+    nonzero = np.any(S_klm, axis=0)
     for l in range(log_wG.size):
         for m in range(log_wL.size):
-            wG_l,wL_m = np.exp(log_wG[l]),np.exp(log_wL[m])
-            gV_FT = calc_gV_FT(x, wG_l, wL_m, folding_thresh)
-            
-            S_klm_FT = np.fft.rfft(S_klm[:,l,m]) * gV_FT
-            S_k_FT_re += S_klm_FT
+            if nonzero[l,m]:
+                wG_l,wL_m = np.exp(log_wG[l]),np.exp(log_wL[m])
+                gV_FT = calc_gV_FT(x, wG_l, wL_m, folding_thresh)
+                
+                S_klm_FT = np.fft.rfft(S_klm[:,l,m]) * gV_FT
+                S_k_FT_re += S_klm_FT
 
-            if log_correction:
-                WGx = (pi*wG_l*x)**2/(4*log(2))
-                WLx = pi*wL_m*x
-                S_klm_FT *= (-2*WGx**2 + 3*WGx - 2*WGx*WLx - 0.5*WLx**2 + WLx)
-                Sv_k_FT_im += 1j/(2*pi*x) * S_klm_FT
+                if log_correction:
+                    WGx = (pi*wG_l*x)**2/(4*log(2))
+                    WLx = pi*wL_m*x
+                    S_klm_FT *= (-2*WGx**2 + 3*WGx - 2*WGx*WLx - 0.5*WLx**2 + WLx)
+                    Sv_k_FT_im += 1j/(2*pi*x) * S_klm_FT
             
     S_k = np.fft.irfft(S_k_FT_re)[:Nv]
     if log_correction:

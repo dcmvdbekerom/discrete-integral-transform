@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
 import sys
+sys.path.append('../hapi/')
+from discrete_integral_transform_hapi import synthesize_spectrum as  synthesize_spectrum2
 
 ## Download database files from https://hitran.org/hitemp/
 HITEMP_path = "C:/HITEMP/"
@@ -23,9 +25,15 @@ T = 1000.0 #K
 p =    0.1 #bar
 
 v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
+wGi = np.exp(log_wGi)
+wLi = np.exp(log_wLi)
 print('{:.2f}M lines '.format(len(v0i)*1e-6))
 
-I_arr, S_kl = synthesize_spectrum(v_arr,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL)
-plt.plot(v_arr,I_arr,'-')
+I_arr, S_klm = synthesize_spectrum(v_arr,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL)
+I_arr2, S_klm2 = synthesize_spectrum2(v_arr,v0i,wGi,wLi,S0i,dxG=dxG,dxL=dxL)
+
+
+plt.plot(v_arr,I_arr-I_arr2,'-')
+# plt.plot(v_arr,I_arr2,'--')lo
 plt.xlim(v_arr[-1],v_arr[0])
 plt.show()

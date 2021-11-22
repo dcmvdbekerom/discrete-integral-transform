@@ -29,10 +29,23 @@ print('{:.2f}M lines '.format(len(v0i)*1e-6))
 
 #init v-grids:
 
-v_min = 2304.3 #cm-1
-v_max = 2305.3 #cm-1
+v_min = 2304.5 #cm-1
+v_max = 2304.7 #cm-1
 dv = 0.0001 #cm-1
 v_lin = np.arange(v_min,v_max,dv)
+
+idx = (v0i >= v_min)&(v0i < v_max)
+v0i = v0i[idx]
+log_wGi = log_wGi[idx]
+log_wLi = log_wLi[idx]
+S0i = S0i[idx]
+
+idx = np.argsort(S0i)[::-1]
+v0i = v0i[idx]
+log_wGi = log_wGi[idx]
+log_wLi = log_wLi[idx]
+S0i = S0i[idx]
+
 
 R = v_max/dv
 Nv_log = int(np.log(v_max/v_min)*R)
@@ -57,7 +70,7 @@ I_loglin = CubicSpline(v_log, I_log)(v_lin)
 ##plt.plot(v_lin,I_loglin,'.-',label='loglin')
 ##
 
-plt.plot(v_lin,I_loglin - I_lin)
+plt.plot(v_lin,I_loglin - I_lin,'.-')
 
 plt.xlim(v_max,v_min)
 ##plt.yscale('log')

@@ -143,14 +143,16 @@ def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
 
     dv = (v[-1] - v[0]) / (v.size - 1)
     x  = np.fft.rfftfreq(2 * v.size, dv)
+    nonzero = np.any(S_klm, axis=0)
 
     # Sum over lineshape distribution matrix -- Eqs 3.2 & 3.3:
     S_k_FT = np.zeros(v.size + 1, dtype = np.complex64)
     for l in range(log_wG.size):
         for m in range(log_wL.size):
-            wG_l,wL_m = np.exp(log_wG[l]), np.exp(log_wL[m])
-            gV_FT = calc_gV_FT(x, wG_l, wL_m, dv, folding_thresh)               
-            S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
+            if nonzero[l,m]:
+                wG_l,wL_m = np.exp(log_wG[l]), np.exp(log_wL[m])
+                gV_FT = calc_gV_FT(x, wG_l, wL_m, dv, folding_thresh)               
+                S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
     
     return np.fft.irfft(S_k_FT)[:v.size] / dv
 
