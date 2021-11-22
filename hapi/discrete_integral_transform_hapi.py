@@ -11,7 +11,7 @@ def init_w_axis(dx, log_wi, epsilon=1e-4):
     log_w_min = np.min(log_wi)
     log_w_max = np.max(log_wi)
     
-    # Make last bin a bit wider to fit lines that fall exactly on the boundary:
+    # Slightly increase max to fit lines that fall exactly on the boundary:
     log_w_max += epsilon
 
     N = np.ceil((log_w_max - log_w_min) / dx) + 1
@@ -20,8 +20,8 @@ def init_w_axis(dx, log_wi, epsilon=1e-4):
 
 
 ## Calculate grid indices and grid alignments:   
-def get_indices(arr_i, axis_arr):
-    pos    = np.interp(arr_i, axis_arr, np.arange(axis_arr.size))
+def get_indices(arr_i, ax):
+    pos    = np.interp(arr_i, ax, np.arange(ax.size))
     index  = pos.astype(int) 
     return index, index + 1, pos - index 
 
@@ -56,14 +56,14 @@ def calc_gV_FT(x, wG, wL, dv, folding_thresh=1e-6):
     # Uncorrected result:
     result = gV_FT(x,wG,wL)
     
-    # If the gV_FT doesn't go to zero at the Nyquist frequency, ringing will 
-    # be introduced. This can be corrected by "folding" the non-zero parts 
+    # If the gV_FT doesn't go to zero at the Nyquist frequency, ringing is 
+    # introduced. This can be corrected by "folding" the non-zero parts 
     # into the sampled frequency domain. Keep doing this until the gV_FT gets
     # sufficiently close to zero (below ```folding_thresh```)
     
     n = 1
     while gV_FT(n/(2*dv),wG,wL) >= folding_thresh:
-        result += gV_FT(n/(2*dv) + x[::1-2*(n&1)], wG, wL)
+        result += gV_FT(x + n/(2*dv), wG, wL)[::1-2*(n&1)]
         n += 1
 
     return result
