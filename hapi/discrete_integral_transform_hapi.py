@@ -20,23 +20,23 @@ def init_w_axis(dx, log_wi, epsilon=1e-4):
 
 
 ## Calculate grid indices and grid alignments:   
-def get_indices(arr_i, ax):
-    pos    = np.interp(arr_i, ax, np.arange(ax.size))
+def get_indices(arr, ax):
+    pos    = np.interp(arr, ax, np.arange(ax.size))
     index  = pos.astype(int) 
     return index, index + 1, pos - index 
 
 
 ## Calculate lineshape distribution matrix:
-def calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
+def calc_matrix(v_ax, log_wG_ax, log_wL_ax, v0i, log_wGi, log_wLi, S0i):
     
     # Init the matrix with double the spectral size to prevent circular 
     # convolution:
-    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size))
+    S_klm = np.zeros((2 * v_ax.size, log_wG_ax.size, log_wL_ax.size))
     
     # Calculate grid indices and simple weights for every spectral line:
-    ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
-    li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
-    mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
+    ki0, ki1, avi = get_indices(v0i, v_ax)          #Eqs 3.4 & 3.6
+    li0, li1, aGi = get_indices(log_wGi, log_wG_ax) #Eqs 3.7 & 3.10
+    mi0, mi1, aLi = get_indices(log_wLi, log_wL_ax) #Eqs 3.7 & 3.10
     
     # Distribute lines over matrix:
     np.add.at(S_klm, (ki0, li0, mi0), S0i * (1-avi) * (1-aGi) * (1-aLi))
@@ -70,22 +70,20 @@ def calc_gV_FT(x, wG, wL, dv, folding_thresh=1e-6):
 
 
 ## Apply transform:
-def apply_transform(v,log_wG,log_wL,S_klm,folding_thresh):
+def apply_transform(v_ax,log_wG_ax,log_wL_ax,S_klm,folding_thresh):
 
-    dv = (v[-1] - v[0]) / (v.size - 1)
-    x  = np.fft.rfftfreq(2 * v.size, dv)
-    nonzero = np.any(S_klm, axis=0)
+    dv = (v_ax[-1] - v_ax[0]) / (v_ax.size - 1)
+    x  = np.fft.rfftfreq(2 * v_ax.size, dv)
 
     # Sum over lineshape distribution matrix -- Eqs 3.2 & 3.3:
-    S_k_FT = np.zeros(v.size + 1, dtype=complex)
-    for l in range(log_wG.size):
-        for m in range(log_wL.size):
-            if nonzero[l,m]:
-                wG_l,wL_m = np.exp(log_wG[l]), np.exp(log_wL[m])
-                gV_FT = calc_gV_FT(x, wG_l, wL_m, dv, folding_thresh)               
-                S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
+    S_k_FT = np.zeros(v_ax.size + 1, dtype=complex)
+    for l in range(log_wG_ax.size):
+        for m in range(log_wL_ax.size):
+            wG_l,wL_m = np.exp(log_wG_ax[l]), np.exp(log_wL_ax[m])
+            gV_FT = calc_gV_FT(x, wG_l, wL_m, dv, folding_thresh)               
+            S_k_FT += np.fft.rfft(S_klm[:,l,m]) * gV_FT
     
-    return np.fft.irfft(S_k_FT)[:v.size] / dv
+    return np.fft.irfft(S_k_FT)[:v_ax.size] / dv
 
 
 ## Synthesize spectrum:
