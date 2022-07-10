@@ -21,7 +21,7 @@ v_arr = np.arange(v_min,v_max,dv) #cm-1
 dxG = 0.1
 dxL = 0.1
 
-T = 1000.0 #K
+T = 2000.0 #K
 p =    0.1 #bar
 
 v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
@@ -33,7 +33,12 @@ I_arr, S_klm = synthesize_spectrum(v_arr,v0i,log_wGi,log_wLi,S0i,dxG=dxG,dxL=dxL
 I_arr2, S_klm2 = synthesize_spectrum2(v_arr,v0i,wGi,wLi,S0i,dxG=dxG,dxL=dxL)
 
 
-plt.plot(v_arr,I_arr-I_arr2,'-')
-# plt.plot(v_arr,I_arr2,'--')lo
+##plt.plot(v_arr,I_arr-I_arr2,'-')
+plt.plot(v_arr,I_arr,'-',lw=0.5)
+##plt.plot(v_arr,I_arr2,'--')
 plt.xlim(v_arr[-1],v_arr[0])
+plt.axhline(0,c='k')
+plt.xlabel('$\\nu$ (cm$^{-1}$)')
+plt.xlim(2231.01,2228.99)
+plt.ylim(-0.02,0.3)
 plt.show()
