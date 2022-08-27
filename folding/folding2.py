@@ -19,7 +19,7 @@ x_arr = np.fft.rfftfreq(v_arr.size + N_zpad, dv)
 x_fold = (x_arr,x_arr[::-1])
 folding_thresh = 1e-6
 
-w_arr = np.array([5,2,1,0.5])*dv
+w_arr = np.array([5,2,1,0.5,0.2])*dv
 
 fig, (ax1,ax2) = plt.subplots(1,2,figsize=(10,4))
 plt.subplots_adjust(left=0.05,right=0.95,bottom=0.15)
@@ -45,7 +45,7 @@ for w in w_arr:
     p, = ax1.plot(v_arr,I,'--',alpha=0.5)
     axins.plot(v_arr,I,'--',alpha=0.5)
     c = p.get_color()
-    ax2.plot(x_arr,I_FT,'--',c=c,alpha = 0.5)
+    
 
     I2 = gG(v_arr,w)
     I2_FT = np.fft.rfft(list(I2) + [0] + list(I2)[:0:-1])*dv # this assumes N_zpad = v_arr.size
@@ -53,7 +53,10 @@ for w in w_arr:
 
     ax1.plot(v_arr,I2,c=c,label = '$w_G = {:.1f} \\times \\Delta\\nu$'.format(w/dv))
     axins.plot(v_arr,I2,c=c)
-    ax2.plot(x_arr,I2_FT.real,c=c) ## I2 is symmetric, so I2_FT has only real components
+
+##    ax2.plot(x_arr,I_FT,'--',c=c,alpha = 0.5)
+##    ax2.plot(x_arr,I2_FT.real,c=c) ## I2 is symmetric, so I2_FT has only real components
+    ax2.plot(x_arr,I2_FT.real - I_FT, c=c)
     
 N_ticks = 6
 ax1.set_title('Real domain')
