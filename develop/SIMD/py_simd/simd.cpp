@@ -31,7 +31,53 @@ void cpp_add_at32(float* S_klm, int* k, int* l, int* m, float* values, int Nv, i
         S_klm[NwG * NwL * k[i] + NwL * l[i] + m[i]] += values[i];  
     }
 }
+
+
+void cpp_calc_matrix(float* database, float* S_klm, 
+                        float v_min, float log_wG_min, float log_wL_min,
+                        float dv,    float dxG,        float dxL,
+                        int Nv,      int NwG,          int NwL, 
+                        int Nlines) {
     
+    for (int i = 0; i < 4*Nlines; i += 4) {
+        
+        float k = (database[i + 1] - v_min) / dv;
+        int k0 = (int)k;
+        int k1 = k0 + 1;
+        float av = k - k0;
+
+        float l = (database[i + 2] - log_wG_min) / dxG;
+        int l0 = (int)l;
+        int l1 = l0 + 1;
+        float awG = l - l0;
+
+        float m = (database[i + 3] - log_wL_min) / dxL;
+        int m0 = (int)m;
+        int m1 = m0 + 1;
+        float awL = m - m0;
+
+        //                 v              G         L
+        int index000 = k0 * NwG * NwL + l0 * NwL + m0;
+        int index001 = k0 * NwG * NwL + l0 * NwL + m1;
+        int index010 = k0 * NwG * NwL + l1 * NwL + m0;
+        int index011 = k0 * NwG * NwL + l1 * NwL + m1;
+        int index100 = k1 * NwG * NwL + l0 * NwL + m0;
+        int index101 = k1 * NwG * NwL + l0 * NwL + m1;
+        int index110 = k1 * NwG * NwL + l1 * NwL + m0;
+        int index111 = k1 * NwG * NwL + l1 * NwL + m1;
+
+        S_klm[index000] += (1-av) * (1-awG) * (1-awL) * database[i];
+        S_klm[index001] += (1-av) * (1-awG) *    awL  * database[i];
+        S_klm[index010] += (1-av) *    awG  * (1-awL) * database[i];
+        S_klm[index011] += (1-av) *    awG  *    awL  * database[i];
+        S_klm[index100] +=    av  * (1-awG) * (1-awL) * database[i];
+        S_klm[index101] +=    av  * (1-awG) *    awL  * database[i];
+        S_klm[index110] +=    av  *    awG  * (1-awL) * database[i];
+        S_klm[index111] +=    av  *    awG  *    awL  * database[i];
+
+    }
+}
+
 
 void cpp_calc_matrix_avx(float* database, float* S_klm, 
                         float v_min, float log_wG_min, float log_wL_min,

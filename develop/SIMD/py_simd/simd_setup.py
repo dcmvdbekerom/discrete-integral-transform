@@ -21,6 +21,7 @@ def get_ext_modules(with_binaries):
         return {"cmdclass": cmdclass, "ext_modules": ext_modules}
     try:
         import cython
+
     except (ModuleNotFoundError) as err:
         raise BuildFailed(
             "Cython not found : Skipping all Cython extensions...!"
@@ -29,12 +30,14 @@ def get_ext_modules(with_binaries):
     print("Cython " + cython.__version__)
 
     from Cython.Distutils import build_ext
+    import Cython.Compiler.Options
+    Cython.Compiler.Options.annotate = True
 
     class build_ext_subclass(build_ext):
         def build_extensions(self):
             c = self.compiler.compiler_type
             copt = {
-                "msvc": ["/openmp", "/Ox", "/fp:fast", "/arch:AVX2", "/favor:INTEL64"],
+                "msvc": ["/openmp", "/Ox", "/fp:fast",  "/favor:INTEL64"], #"/arch:AVX2",
                 "mingw32": ["-fopenmp", "-O3", "-ffast-math", "-march=native"],
             }
 

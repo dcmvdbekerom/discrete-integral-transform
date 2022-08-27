@@ -7,7 +7,9 @@ from discrete_integral_transform_simd import (
     calc_matrix_py1,
     calc_matrix_py2,
     calc_matrix_cy1,
+    calc_matrix_cy2,
     calc_matrix_cpp1,
+    calc_matrix_cpp2,
     calc_matrix_simd1,
     apply_transform_py1,
     synthesize_spectrum,
@@ -30,28 +32,28 @@ v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
 print('{:.2f}M lines loaded...'.format(len(v0i)*1e-6))
 print('              Matrix (ms):  Transform (ms):')
 
+##for i in range(1):
+##    print('Baseline:     ',end='')
+##    I1_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
+##                            f_calc_matrix=calc_matrix_py1,
+##                            f_apply_transform=apply_transform_py1)
+##    print('{:10.0f}\t{:10.0f}'.format(
+##        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
+##print('')
+
 for i in range(5):
-    print('Baseline:     ',end='')
+    print('Cython: ', end='')
     I1_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
-                            f_calc_matrix=calc_matrix_py1,
+                            f_calc_matrix=calc_matrix_cy2,
                             f_apply_transform=apply_transform_py1)
     print('{:10.0f}\t{:10.0f}'.format(
         (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
 print('')
 
 for i in range(5):
-    print('Cython add_at:', end='')
+    print('C++:    ', end='')
     I2_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
-                            f_calc_matrix=calc_matrix_cy1,
-                            f_apply_transform=apply_transform_py1)
-    print('{:10.0f}\t{:10.0f}'.format(
-        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
-print('')
-
-for i in range(5):
-    print('SIMD:         ', end='')
-    I3_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
-                            f_calc_matrix=calc_matrix_simd1,
+                            f_calc_matrix=calc_matrix_cpp2,
                             f_apply_transform=apply_transform_py1)
     print('{:10.0f}\t{:10.0f}'.format(
         (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
@@ -60,7 +62,7 @@ print('')
 
 plt.axhline(0,c='k')
 plt.plot(v_arr, I1_arr, 'k', lw=3, label = 'Baseline')
-plt.plot(v_arr, I3_arr,  'r', lw=1, label = 'SIMD')
+plt.plot(v_arr, I2_arr,  'r', lw=1, label = 'SIMD')
 plt.xlim(v_max, v_min)
 plt.legend()
 plt.show()
