@@ -60,14 +60,9 @@ def cy_calc_matrix( np.ndarray[np.float32_t, ndim=3] S_klm,
     
     cdef float k,l,m, av,awG,awL
     cdef int k0,k1,l0,l1,m0,m1
-
-    cdef int Nv = <int> S_klm.shape[0], 
-    cdef int NwG = <int> S_klm.shape[1], 
-    cdef int NwL = <int> S_klm.shape[2], 
+    cdef float S0i, v0i, wGi, wLi
     cdef int Nlines = <int> S0_arr.shape[0]
     
-    cdef float S0i, v0i, wGi, wLi
-
     for i in range(Nlines):
     
         S0i = S0_arr[i]
