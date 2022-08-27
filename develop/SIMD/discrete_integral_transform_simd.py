@@ -2,7 +2,16 @@
 
 import numpy as np
 from time import perf_counter
-from py_simd.py_simd import add_at32
+from py_simd.py_simd import cy_add_at32, cpp_add_at32, cpp_calc_matrix_avx
+
+def aligned_zeros(shape, alignment=32, dtype=np.float32, order='c', **kwargs):
+    N = np.prod(shape)
+    dsize = np.dtype(dtype).itemsize
+    arr = np.zeros(N + alignment // dsize, dtype=dtype, **kwargs)
+    diff = arr.ctypes.data % alignment
+    start = diff // dsize
+    return arr[start:start + N].reshape(shape, order=order)
+
 
 def init_w_axis(dx, log_wi):
     log_w_min = np.min(log_wi)
@@ -14,6 +23,16 @@ def init_w_axis(dx, log_wi):
     
 def get_indices(arr_i, axis):
     pos   = np.interp(arr_i, axis, np.arange(axis.size))
+    index = pos.astype(int)
+    a = (pos - index).astype(np.float32)
+    return index, index + 1, a
+
+
+def get_indices2(arr_i, axis):
+    Nx = axis.size
+    x_min = axis[0]
+    dx = (axis[-1] - axis[0])/(Nx - 1)
+    pos   = (arr_i - x_min) / dx
     index = pos.astype(int)
     a = (pos - index).astype(np.float32)
     return index, index + 1, a
@@ -36,7 +55,24 @@ def calc_matrix_py1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     np.add.at(S_klm, (ki1, li1, mi0), S0i *    avi  *    aGi  * (1-aLi))
     np.add.at(S_klm, (ki1, li1, mi1), S0i *    avi  *    aGi  *    aLi )
     return S_klm
+
+
+def calc_matrix_py2(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
+    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
+    ki0, ki1, avi = get_indices2(v0i, v)          #Eqs 3.4 & 3.6
+    li0, li1, aGi = get_indices2(log_wGi, log_wG) #Eqs 3.7 & 3.10
+    mi0, mi1, aLi = get_indices2(log_wLi, log_wL) #Eqs 3.7 & 3.10
     
+    np.add.at(S_klm, (ki0, li0, mi0), S0i * (1-avi) * (1-aGi) * (1-aLi))
+    np.add.at(S_klm, (ki0, li0, mi1), S0i * (1-avi) * (1-aGi) *    aLi )
+    np.add.at(S_klm, (ki0, li1, mi0), S0i * (1-avi) *    aGi  * (1-aLi))
+    np.add.at(S_klm, (ki0, li1, mi1), S0i * (1-avi) *    aGi  *    aLi )
+    np.add.at(S_klm, (ki1, li0, mi0), S0i *    avi  * (1-aGi) * (1-aLi))
+    np.add.at(S_klm, (ki1, li0, mi1), S0i *    avi  * (1-aGi) *    aLi )
+    np.add.at(S_klm, (ki1, li1, mi0), S0i *    avi  *    aGi  * (1-aLi))
+    np.add.at(S_klm, (ki1, li1, mi1), S0i *    avi  *    aGi  *    aLi )
+    return S_klm
+
     
 def calc_matrix_cy1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
@@ -44,15 +80,56 @@ def calc_matrix_cy1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
     mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
 
-    add_at32(S_klm, ki0, li0, mi0, S0i * (1-avi) * (1-aGi) * (1-aLi))
-    add_at32(S_klm, ki0, li0, mi1, S0i * (1-avi) * (1-aGi) *    aLi )
-    add_at32(S_klm, ki0, li1, mi0, S0i * (1-avi) *    aGi  * (1-aLi))
-    add_at32(S_klm, ki0, li1, mi1, S0i * (1-avi) *    aGi  *    aLi )
-    add_at32(S_klm, ki1, li0, mi0, S0i *    avi  * (1-aGi) * (1-aLi))
-    add_at32(S_klm, ki1, li0, mi1, S0i *    avi  * (1-aGi) *    aLi )
-    add_at32(S_klm, ki1, li1, mi0, S0i *    avi  *    aGi  * (1-aLi))
-    add_at32(S_klm, ki1, li1, mi1, S0i *    avi  *    aGi  *    aLi )
+    cy_add_at32(S_klm, ki0, li0, mi0, S0i * (1-avi) * (1-aGi) * (1-aLi))
+    cy_add_at32(S_klm, ki0, li0, mi1, S0i * (1-avi) * (1-aGi) *    aLi )
+    cy_add_at32(S_klm, ki0, li1, mi0, S0i * (1-avi) *    aGi  * (1-aLi))
+    cy_add_at32(S_klm, ki0, li1, mi1, S0i * (1-avi) *    aGi  *    aLi )
+    cy_add_at32(S_klm, ki1, li0, mi0, S0i *    avi  * (1-aGi) * (1-aLi))
+    cy_add_at32(S_klm, ki1, li0, mi1, S0i *    avi  * (1-aGi) *    aLi )
+    cy_add_at32(S_klm, ki1, li1, mi0, S0i *    avi  *    aGi  * (1-aLi))
+    cy_add_at32(S_klm, ki1, li1, mi1, S0i *    avi  *    aGi  *    aLi )
     return S_klm
+
+
+def calc_matrix_cpp1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
+    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
+    ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
+    li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
+    mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
+
+    cpp_add_at32(S_klm, ki0, li0, mi0, S0i * (1-avi) * (1-aGi) * (1-aLi))
+    cpp_add_at32(S_klm, ki0, li0, mi1, S0i * (1-avi) * (1-aGi) *    aLi )
+    cpp_add_at32(S_klm, ki0, li1, mi0, S0i * (1-avi) *    aGi  * (1-aLi))
+    cpp_add_at32(S_klm, ki0, li1, mi1, S0i * (1-avi) *    aGi  *    aLi )
+    cpp_add_at32(S_klm, ki1, li0, mi0, S0i *    avi  * (1-aGi) * (1-aLi))
+    cpp_add_at32(S_klm, ki1, li0, mi1, S0i *    avi  * (1-aGi) *    aLi )
+    cpp_add_at32(S_klm, ki1, li1, mi0, S0i *    avi  *    aGi  * (1-aLi))
+    cpp_add_at32(S_klm, ki1, li1, mi1, S0i *    avi  *    aGi  *    aLi )
+    return S_klm
+
+
+def calc_matrix_simd1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
+
+    #Eventually this will be a pure cython function
+    database = aligned_zeros((S0i.size, 4), dtype=np.float32)
+    
+    database[:,0] = S0i
+    database[:,1] = v0i
+    database[:,2] = log_wGi
+    database[:,3] = log_wLi
+
+    dv = (v[-1] - v[0]) / (v.size - 1)
+    dxG = (log_wG[-1] - log_wG[0]) / (log_wG.size - 1)
+    dxL = (log_wL[-1] - log_wL[0]) / (log_wL.size - 1)
+    
+    S_klm = aligned_zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
+
+    cpp_calc_matrix_avx(database, S_klm,
+                        v[0], log_wG[0], log_wL[0],
+                        dv, dxG, dxL)
+    
+    return S_klm
+
 
 
 ## Apply_transform functions:

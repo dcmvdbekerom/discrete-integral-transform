@@ -34,7 +34,7 @@ def get_ext_modules(with_binaries):
         def build_extensions(self):
             c = self.compiler.compiler_type
             copt = {
-                "msvc": ["/openmp", "/Ox", "/fp:fast", "/favor:INTEL64"],
+                "msvc": ["/openmp", "/Ox", "/fp:fast", "/arch:AVX2", "/favor:INTEL64"],
                 "mingw32": ["-fopenmp", "-O3", "-ffast-math", "-march=native"],
             }
 
@@ -66,7 +66,7 @@ def get_ext_modules(with_binaries):
             include_dirs=[get_include()],
             language="c++",
             extra_link_args=[],
-            define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
+            #define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
         )
     )
 
