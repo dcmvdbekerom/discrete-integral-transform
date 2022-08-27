@@ -111,12 +111,14 @@ def calc_matrix_cpp1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
 def calc_matrix_simd1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
 
     #Eventually this will be a pure cython function
-    database = aligned_zeros((S0i.size, 4), dtype=np.float32)
+    Nlines = S0i.size
+    Nl_odd = Nlines & 1
+    database = aligned_zeros((Nlines + Nl_odd, 4), dtype=np.float32)
     
-    database[:,0] = S0i
-    database[:,1] = v0i
-    database[:,2] = log_wGi
-    database[:,3] = log_wLi
+    database[0:Nlines, 0] = S0i
+    database[0:Nlines, 1] = v0i
+    database[0:Nlines, 2] = log_wGi
+    database[0:Nlines, 3] = log_wLi
 
     dv = (v[-1] - v[0]) / (v.size - 1)
     dxG = (log_wG[-1] - log_wG[0]) / (log_wG.size - 1)
