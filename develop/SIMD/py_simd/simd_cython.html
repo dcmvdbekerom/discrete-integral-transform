@@ -975,7 +975,7 @@ static PyObject *__pyx_pf_7py_simd_4cpp_add_at32(CYTHON_UNUSED PyObject *__pyx_s
 <pre class="cython line score-0">&#xA0;<span class="">045</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">S_klm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">2</span><span class="p">],</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">046</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">047</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">048</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">048</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">049</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">050</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">051</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">nonecheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
@@ -1238,13 +1238,8 @@ static PyObject *__pyx_pf_7py_simd_6cy_calc_matrix(CYTHON_UNUSED PyObject *__pyx
     __pyx_t_4 = 3;
     __pyx_v_wLi = (*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_database.rcbuffer-&gt;pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_database.diminfo[0].strides, __pyx_t_4, __pyx_pybuffernd_database.diminfo[1].strides));
 </pre><pre class="cython line score-0">&#xA0;<span class="">073</span>: </pre>
-<pre class="cython line score-5" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">074</span>:         <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">v0i</span> <span class="o">-</span> <span class="n">v_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">dv</span></pre>
-<pre class='cython code score-5 '>    __pyx_t_6 = (__pyx_v_v0i - __pyx_v_v_min);
-    if (unlikely(__pyx_v_dv == 0)) {
-      <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-      <span class='error_goto'>__PYX_ERR(0, 74, __pyx_L1_error)</span>
-    }
-    __pyx_v_k = (__pyx_t_6 / __pyx_v_dv);
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">074</span>:         <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">v0i</span> <span class="o">-</span> <span class="n">v_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">dv</span></pre>
+<pre class='cython code score-0 '>    __pyx_v_k = ((__pyx_v_v0i - __pyx_v_v_min) / __pyx_v_dv);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">075</span>:         <span class="n">k0</span> <span class="o">=</span> <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span><span class="n">k</span></pre>
 <pre class='cython code score-0 '>    __pyx_v_k0 = ((int)__pyx_v_k);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">076</span>:         <span class="n">k1</span> <span class="o">=</span> <span class="n">k0</span> <span class="o">+</span> <span class="mf">1</span></pre>
@@ -1252,13 +1247,8 @@ static PyObject *__pyx_pf_7py_simd_6cy_calc_matrix(CYTHON_UNUSED PyObject *__pyx
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">077</span>:         <span class="n">av</span> <span class="o">=</span> <span class="n">k</span> <span class="o">-</span> <span class="n">k0</span></pre>
 <pre class='cython code score-0 '>    __pyx_v_av = (__pyx_v_k - __pyx_v_k0);
 </pre><pre class="cython line score-0">&#xA0;<span class="">078</span>: </pre>
-<pre class="cython line score-5" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">079</span>:         <span class="n">l</span> <span class="o">=</span> <span class="p">(</span><span class="n">wGi</span> <span class="o">-</span> <span class="n">log_wG_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">dxG</span></pre>
-<pre class='cython code score-5 '>    __pyx_t_6 = (__pyx_v_wGi - __pyx_v_log_wG_min);
-    if (unlikely(__pyx_v_dxG == 0)) {
-      <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-      <span class='error_goto'>__PYX_ERR(0, 79, __pyx_L1_error)</span>
-    }
-    __pyx_v_l = (__pyx_t_6 / __pyx_v_dxG);
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">079</span>:         <span class="n">l</span> <span class="o">=</span> <span class="p">(</span><span class="n">wGi</span> <span class="o">-</span> <span class="n">log_wG_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">dxG</span></pre>
+<pre class='cython code score-0 '>    __pyx_v_l = ((__pyx_v_wGi - __pyx_v_log_wG_min) / __pyx_v_dxG);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">080</span>:         <span class="n">l0</span> <span class="o">=</span> <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span><span class="n">l</span></pre>
 <pre class='cython code score-0 '>    __pyx_v_l0 = ((int)__pyx_v_l);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">081</span>:         <span class="n">l1</span> <span class="o">=</span> <span class="n">l0</span> <span class="o">+</span> <span class="mf">1</span></pre>
@@ -1266,13 +1256,8 @@ static PyObject *__pyx_pf_7py_simd_6cy_calc_matrix(CYTHON_UNUSED PyObject *__pyx
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">082</span>:         <span class="n">awG</span> <span class="o">=</span> <span class="n">l</span> <span class="o">-</span> <span class="n">l0</span></pre>
 <pre class='cython code score-0 '>    __pyx_v_awG = (__pyx_v_l - __pyx_v_l0);
 </pre><pre class="cython line score-0">&#xA0;<span class="">083</span>: </pre>
-<pre class="cython line score-5" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">084</span>:         <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">wLi</span> <span class="o">-</span> <span class="n">log_wL_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">dxL</span></pre>
-<pre class='cython code score-5 '>    __pyx_t_6 = (__pyx_v_wLi - __pyx_v_log_wL_min);
-    if (unlikely(__pyx_v_dxL == 0)) {
-      <span class='py_c_api'>PyErr_SetString</span>(PyExc_ZeroDivisionError, "float division");
-      <span class='error_goto'>__PYX_ERR(0, 84, __pyx_L1_error)</span>
-    }
-    __pyx_v_m = (__pyx_t_6 / __pyx_v_dxL);
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">084</span>:         <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">wLi</span> <span class="o">-</span> <span class="n">log_wL_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">dxL</span></pre>
+<pre class='cython code score-0 '>    __pyx_v_m = ((__pyx_v_wLi - __pyx_v_log_wL_min) / __pyx_v_dxL);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">085</span>:         <span class="n">m0</span> <span class="o">=</span> <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span><span class="n">m</span></pre>
 <pre class='cython code score-0 '>    __pyx_v_m0 = ((int)__pyx_v_m);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">086</span>:         <span class="n">m1</span> <span class="o">=</span> <span class="n">m0</span> <span class="o">+</span> <span class="mf">1</span></pre>
@@ -1283,50 +1268,47 @@ static PyObject *__pyx_pf_7py_simd_6cy_calc_matrix(CYTHON_UNUSED PyObject *__pyx
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">089</span>:         <span class="n">S_klm</span><span class="p">[</span><span class="n">k0</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">m0</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">av</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">awG</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">awL</span><span class="p">)</span> <span class="o">*</span> <span class="n">S0i</span></pre>
 <pre class='cython code score-0 '>    __pyx_t_4 = __pyx_v_k0;
     __pyx_t_5 = __pyx_v_l0;
-    __pyx_t_7 = __pyx_v_m0;
-    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_7, __pyx_pybuffernd_S_klm.diminfo[2].strides) += ((((1.0 - __pyx_v_av) * (1.0 - __pyx_v_awG)) * (1.0 - __pyx_v_awL)) * __pyx_v_S0i);
+    __pyx_t_6 = __pyx_v_m0;
+    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[2].strides) += ((((1.0 - __pyx_v_av) * (1.0 - __pyx_v_awG)) * (1.0 - __pyx_v_awL)) * __pyx_v_S0i);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">090</span>:         <span class="n">S_klm</span><span class="p">[</span><span class="n">k0</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">m1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">av</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">awG</span><span class="p">)</span> <span class="o">*</span>    <span class="n">awL</span>  <span class="o">*</span> <span class="n">S0i</span></pre>
-<pre class='cython code score-0 '>    __pyx_t_7 = __pyx_v_k0;
+<pre class='cython code score-0 '>    __pyx_t_6 = __pyx_v_k0;
     __pyx_t_5 = __pyx_v_l0;
     __pyx_t_4 = __pyx_v_m1;
-    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[2].strides) += ((((1.0 - __pyx_v_av) * (1.0 - __pyx_v_awG)) * __pyx_v_awL) * __pyx_v_S0i);
+    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[2].strides) += ((((1.0 - __pyx_v_av) * (1.0 - __pyx_v_awG)) * __pyx_v_awL) * __pyx_v_S0i);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">091</span>:         <span class="n">S_klm</span><span class="p">[</span><span class="n">k0</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m0</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">av</span><span class="p">)</span> <span class="o">*</span>    <span class="n">awG</span>  <span class="o">*</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">awL</span><span class="p">)</span> <span class="o">*</span> <span class="n">S0i</span></pre>
 <pre class='cython code score-0 '>    __pyx_t_4 = __pyx_v_k0;
     __pyx_t_5 = __pyx_v_l1;
-    __pyx_t_7 = __pyx_v_m0;
-    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_7, __pyx_pybuffernd_S_klm.diminfo[2].strides) += ((((1.0 - __pyx_v_av) * __pyx_v_awG) * (1.0 - __pyx_v_awL)) * __pyx_v_S0i);
+    __pyx_t_6 = __pyx_v_m0;
+    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[2].strides) += ((((1.0 - __pyx_v_av) * __pyx_v_awG) * (1.0 - __pyx_v_awL)) * __pyx_v_S0i);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">092</span>:         <span class="n">S_klm</span><span class="p">[</span><span class="n">k0</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">av</span><span class="p">)</span> <span class="o">*</span>    <span class="n">awG</span>  <span class="o">*</span>    <span class="n">awL</span>  <span class="o">*</span> <span class="n">S0i</span></pre>
-<pre class='cython code score-0 '>    __pyx_t_7 = __pyx_v_k0;
+<pre class='cython code score-0 '>    __pyx_t_6 = __pyx_v_k0;
     __pyx_t_5 = __pyx_v_l1;
     __pyx_t_4 = __pyx_v_m1;
-    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[2].strides) += ((((1.0 - __pyx_v_av) * __pyx_v_awG) * __pyx_v_awL) * __pyx_v_S0i);
+    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[2].strides) += ((((1.0 - __pyx_v_av) * __pyx_v_awG) * __pyx_v_awL) * __pyx_v_S0i);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">093</span>:         <span class="n">S_klm</span><span class="p">[</span><span class="n">k1</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">m0</span><span class="p">]</span> <span class="o">+=</span>    <span class="n">av</span>  <span class="o">*</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">awG</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">awL</span><span class="p">)</span> <span class="o">*</span> <span class="n">S0i</span></pre>
 <pre class='cython code score-0 '>    __pyx_t_4 = __pyx_v_k1;
     __pyx_t_5 = __pyx_v_l0;
-    __pyx_t_7 = __pyx_v_m0;
-    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_7, __pyx_pybuffernd_S_klm.diminfo[2].strides) += (((__pyx_v_av * (1.0 - __pyx_v_awG)) * (1.0 - __pyx_v_awL)) * __pyx_v_S0i);
+    __pyx_t_6 = __pyx_v_m0;
+    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[2].strides) += (((__pyx_v_av * (1.0 - __pyx_v_awG)) * (1.0 - __pyx_v_awL)) * __pyx_v_S0i);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">094</span>:         <span class="n">S_klm</span><span class="p">[</span><span class="n">k1</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">m1</span><span class="p">]</span> <span class="o">+=</span>    <span class="n">av</span>  <span class="o">*</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">awG</span><span class="p">)</span> <span class="o">*</span>    <span class="n">awL</span>  <span class="o">*</span> <span class="n">S0i</span></pre>
-<pre class='cython code score-0 '>    __pyx_t_7 = __pyx_v_k1;
+<pre class='cython code score-0 '>    __pyx_t_6 = __pyx_v_k1;
     __pyx_t_5 = __pyx_v_l0;
     __pyx_t_4 = __pyx_v_m1;
-    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[2].strides) += (((__pyx_v_av * (1.0 - __pyx_v_awG)) * __pyx_v_awL) * __pyx_v_S0i);
+    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[2].strides) += (((__pyx_v_av * (1.0 - __pyx_v_awG)) * __pyx_v_awL) * __pyx_v_S0i);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">095</span>:         <span class="n">S_klm</span><span class="p">[</span><span class="n">k1</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m0</span><span class="p">]</span> <span class="o">+=</span>    <span class="n">av</span>  <span class="o">*</span>    <span class="n">awG</span>  <span class="o">*</span> <span class="p">(</span><span class="mf">1</span><span class="o">-</span><span class="n">awL</span><span class="p">)</span> <span class="o">*</span> <span class="n">S0i</span></pre>
 <pre class='cython code score-0 '>    __pyx_t_4 = __pyx_v_k1;
     __pyx_t_5 = __pyx_v_l1;
-    __pyx_t_7 = __pyx_v_m0;
-    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_7, __pyx_pybuffernd_S_klm.diminfo[2].strides) += (((__pyx_v_av * __pyx_v_awG) * (1.0 - __pyx_v_awL)) * __pyx_v_S0i);
+    __pyx_t_6 = __pyx_v_m0;
+    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[2].strides) += (((__pyx_v_av * __pyx_v_awG) * (1.0 - __pyx_v_awL)) * __pyx_v_S0i);
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">096</span>:         <span class="n">S_klm</span><span class="p">[</span><span class="n">k1</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m1</span><span class="p">]</span> <span class="o">+=</span>    <span class="n">av</span>  <span class="o">*</span>    <span class="n">awG</span>  <span class="o">*</span>    <span class="n">awL</span>  <span class="o">*</span> <span class="n">S0i</span></pre>
-<pre class='cython code score-0 '>    __pyx_t_7 = __pyx_v_k1;
+<pre class='cython code score-0 '>    __pyx_t_6 = __pyx_v_k1;
     __pyx_t_5 = __pyx_v_l1;
     __pyx_t_4 = __pyx_v_m1;
-    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[2].strides) += (((__pyx_v_av * __pyx_v_awG) * __pyx_v_awL) * __pyx_v_S0i);
+    *__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[2].strides) += (((__pyx_v_av * __pyx_v_awG) * __pyx_v_awL) * __pyx_v_S0i);
   }
 </pre><pre class="cython line score-0">&#xA0;<span class="">097</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">098</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">099</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">100</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">101</span>: </pre>
-<pre class="cython line score-154" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">102</span>: <span class="k">def</span> <span class="nf">cpp_calc_matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">database</span><span class="p">,</span></pre>
+<pre class="cython line score-154" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">099</span>: <span class="k">def</span> <span class="nf">cpp_calc_matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">2</span><span class="p">]</span> <span class="n">database</span><span class="p">,</span></pre>
 <pre class='cython code score-154 '>/* Python wrapper */
 static PyObject *__pyx_pw_7py_simd_9cpp_calc_matrix(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyMethodDef __pyx_mdef_7py_simd_9cpp_calc_matrix = {"cpp_calc_matrix", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_7py_simd_9cpp_calc_matrix, METH_VARARGS|METH_KEYWORDS, 0};
@@ -1377,47 +1359,47 @@ static PyObject *__pyx_pw_7py_simd_9cpp_calc_matrix(PyObject *__pyx_self, PyObje
         case  1:
         if (likely((values[1] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_S_klm)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 1); <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 1); <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_v_min)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 2); <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 2); <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_log_wG_min)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 3); <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 3); <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_log_wL_min)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 4); <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 4); <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_dv)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 5); <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 5); <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_dxG)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 6); <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 6); <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_dxL)) != 0)) kw_args--;
         else {
-          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 7); <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+          <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, 7); <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
         }
       }
       if (unlikely(kw_args &gt; 0)) {
-        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cpp_calc_matrix") &lt; 0)) <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+        if (unlikely(<span class='pyx_c_api'>__Pyx_ParseOptionalKeywords</span>(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cpp_calc_matrix") &lt; 0)) <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
       }
     } else if (<span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
@@ -1433,23 +1415,23 @@ static PyObject *__pyx_pw_7py_simd_9cpp_calc_matrix(PyObject *__pyx_self, PyObje
     }
     __pyx_v_database = ((PyArrayObject *)values[0]);
     __pyx_v_S_klm = ((PyArrayObject *)values[1]);
-    __pyx_v_v_min = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[2]); if (unlikely((__pyx_v_v_min == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 104, __pyx_L3_error)</span>
-    __pyx_v_log_wG_min = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[3]); if (unlikely((__pyx_v_log_wG_min == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 104, __pyx_L3_error)</span>
-    __pyx_v_log_wL_min = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[4]); if (unlikely((__pyx_v_log_wL_min == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 104, __pyx_L3_error)</span>
-    __pyx_v_dv = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[5]); if (unlikely((__pyx_v_dv == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 105, __pyx_L3_error)</span>
-    __pyx_v_dxG = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[6]); if (unlikely((__pyx_v_dxG == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 105, __pyx_L3_error)</span>
-    __pyx_v_dxL = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[7]); if (unlikely((__pyx_v_dxL == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 105, __pyx_L3_error)</span>
+    __pyx_v_v_min = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[2]); if (unlikely((__pyx_v_v_min == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 101, __pyx_L3_error)</span>
+    __pyx_v_log_wG_min = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[3]); if (unlikely((__pyx_v_log_wG_min == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 101, __pyx_L3_error)</span>
+    __pyx_v_log_wL_min = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[4]); if (unlikely((__pyx_v_log_wL_min == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 101, __pyx_L3_error)</span>
+    __pyx_v_dv = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[5]); if (unlikely((__pyx_v_dv == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+    __pyx_v_dxG = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[6]); if (unlikely((__pyx_v_dxG == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+    __pyx_v_dxL = __pyx_<span class='py_c_api'>PyFloat_AsFloat</span>(values[7]); if (unlikely((__pyx_v_dxL == (float)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L3_error)</span>
+  <span class='pyx_c_api'>__Pyx_RaiseArgtupleInvalid</span>("cpp_calc_matrix", 1, 8, 8, <span class='py_macro_api'>PyTuple_GET_SIZE</span>(__pyx_args)); <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L3_error)</span>
   __pyx_L3_error:;
   <span class='pyx_c_api'>__Pyx_AddTraceback</span>("py_simd.cpp_calc_matrix", __pyx_clineno, __pyx_lineno, __pyx_filename);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_database), __pyx_ptype_5numpy_ndarray, 1, "database", 0))) <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L1_error)</span>
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_S_klm), __pyx_ptype_5numpy_ndarray, 1, "S_klm", 0))) <span class='error_goto'>__PYX_ERR(0, 103, __pyx_L1_error)</span>
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_database), __pyx_ptype_5numpy_ndarray, 1, "database", 0))) <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L1_error)</span>
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_S_klm), __pyx_ptype_5numpy_ndarray, 1, "S_klm", 0))) <span class='error_goto'>__PYX_ERR(0, 100, __pyx_L1_error)</span>
   __pyx_r = __pyx_pf_7py_simd_8cpp_calc_matrix(__pyx_self, __pyx_v_database, __pyx_v_S_klm, __pyx_v_v_min, __pyx_v_log_wG_min, __pyx_v_log_wL_min, __pyx_v_dv, __pyx_v_dxG, __pyx_v_dxL);
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -1482,12 +1464,12 @@ static PyObject *__pyx_pf_7py_simd_8cpp_calc_matrix(CYTHON_UNUSED PyObject *__py
   __pyx_pybuffernd_S_klm.rcbuffer = &amp;__pyx_pybuffer_S_klm;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_database.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_database, &amp;__Pyx_TypeInfo_nn___pyx_t_5numpy_float32_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L1_error)</span>
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_database.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_database, &amp;__Pyx_TypeInfo_nn___pyx_t_5numpy_float32_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L1_error)</span>
   }
   __pyx_pybuffernd_database.diminfo[0].strides = __pyx_pybuffernd_database.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_database.diminfo[0].shape = __pyx_pybuffernd_database.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_database.diminfo[1].strides = __pyx_pybuffernd_database.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_database.diminfo[1].shape = __pyx_pybuffernd_database.rcbuffer-&gt;pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_S_klm, &amp;__Pyx_TypeInfo_nn___pyx_t_5numpy_float32_t, PyBUF_FORMAT| PyBUF_STRIDES, 3, 0, __pyx_stack) == -1)) <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L1_error)</span>
+    if (unlikely(<span class='pyx_c_api'>__Pyx_GetBufferAndValidate</span>(&amp;__pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer, (PyObject*)__pyx_v_S_klm, &amp;__Pyx_TypeInfo_nn___pyx_t_5numpy_float32_t, PyBUF_FORMAT| PyBUF_STRIDES, 3, 0, __pyx_stack) == -1)) <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L1_error)</span>
   }
   __pyx_pybuffernd_S_klm.diminfo[0].strides = __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.strides[0]; __pyx_pybuffernd_S_klm.diminfo[0].shape = __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.shape[0]; __pyx_pybuffernd_S_klm.diminfo[1].strides = __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.strides[1]; __pyx_pybuffernd_S_klm.diminfo[1].shape = __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.shape[1]; __pyx_pybuffernd_S_klm.diminfo[2].strides = __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.strides[2]; __pyx_pybuffernd_S_klm.diminfo[2].shape = __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.shape[2];
 /* … */
@@ -1514,21 +1496,21 @@ static PyObject *__pyx_pf_7py_simd_8cpp_calc_matrix(CYTHON_UNUSED PyObject *__py
   return __pyx_r;
 }
 /* … */
-  __pyx_tuple__9 = <span class='py_c_api'>PyTuple_Pack</span>(8, __pyx_n_s_database, __pyx_n_s_S_klm, __pyx_n_s_v_min, __pyx_n_s_log_wG_min, __pyx_n_s_log_wL_min, __pyx_n_s_dv, __pyx_n_s_dxG, __pyx_n_s_dxL);<span class='error_goto'> if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 102, __pyx_L1_error)</span>
+  __pyx_tuple__9 = <span class='py_c_api'>PyTuple_Pack</span>(8, __pyx_n_s_database, __pyx_n_s_S_klm, __pyx_n_s_v_min, __pyx_n_s_log_wG_min, __pyx_n_s_log_wL_min, __pyx_n_s_dv, __pyx_n_s_dxG, __pyx_n_s_dxL);<span class='error_goto'> if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 99, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_tuple__9);
   <span class='refnanny'>__Pyx_GIVEREF</span>(__pyx_tuple__9);
 /* … */
-  __pyx_t_1 = PyCFunction_NewEx(&amp;__pyx_mdef_7py_simd_9cpp_calc_matrix, NULL, __pyx_n_s_py_simd);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)</span>
+  __pyx_t_1 = PyCFunction_NewEx(&amp;__pyx_mdef_7py_simd_9cpp_calc_matrix, NULL, __pyx_n_s_py_simd);<span class='error_goto'> if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_cpp_calc_matrix, __pyx_t_1) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 102, __pyx_L1_error)</span>
+  if (<span class='py_c_api'>PyDict_SetItem</span>(__pyx_d, __pyx_n_s_cpp_calc_matrix, __pyx_t_1) &lt; 0) <span class='error_goto'>__PYX_ERR(0, 99, __pyx_L1_error)</span>
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
-</pre><pre class="cython line score-0">&#xA0;<span class="">103</span>:                         <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">3</span><span class="p">]</span> <span class="n">S_klm</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">104</span>:                         <span class="nb">float</span> <span class="n">v_min</span><span class="p">,</span> <span class="nb">float</span> <span class="n">log_wG_min</span><span class="p">,</span> <span class="nb">float</span> <span class="n">log_wL_min</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">105</span>:                         <span class="nb">float</span> <span class="n">dv</span><span class="p">,</span> <span class="nb">float</span> <span class="n">dxG</span><span class="p">,</span> <span class="nb">float</span> <span class="n">dxL</span><span class="p">):</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">106</span>: </pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">107</span>:     <span class="n">simd</span><span class="o">.</span><span class="n">cpp_calc_matrix</span><span class="p">(</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">100</span>:                         <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float32_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mf">3</span><span class="p">]</span> <span class="n">S_klm</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">101</span>:                         <span class="nb">float</span> <span class="n">v_min</span><span class="p">,</span> <span class="nb">float</span> <span class="n">log_wG_min</span><span class="p">,</span> <span class="nb">float</span> <span class="n">log_wL_min</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">102</span>:                         <span class="nb">float</span> <span class="n">dv</span><span class="p">,</span> <span class="nb">float</span> <span class="n">dxG</span><span class="p">,</span> <span class="nb">float</span> <span class="n">dxL</span><span class="p">):</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">103</span>: </pre>
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">104</span>:     <span class="n">simd</span><span class="o">.</span><span class="n">cpp_calc_matrix</span><span class="p">(</span></pre>
 <pre class='cython code score-0 '>  cpp_calc_matrix(((float *)(&amp;(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_database.rcbuffer-&gt;pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_database.diminfo[0].strides, __pyx_t_2, __pyx_pybuffernd_database.diminfo[1].strides)))), ((float *)(&amp;(*__Pyx_BufPtrStrided3d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_S_klm.rcbuffer-&gt;pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_S_klm.diminfo[0].strides, __pyx_t_5, __pyx_pybuffernd_S_klm.diminfo[1].strides, __pyx_t_6, __pyx_pybuffernd_S_klm.diminfo[2].strides)))), ((float)__pyx_v_v_min), ((float)__pyx_v_log_wG_min), ((float)__pyx_v_log_wL_min), ((float)__pyx_v_dv), ((float)__pyx_v_dxG), ((float)__pyx_v_dxL), ((int)(__pyx_v_S_klm-&gt;dimensions[0])), ((int)(__pyx_v_S_klm-&gt;dimensions[1])), ((int)(__pyx_v_S_klm-&gt;dimensions[2])), ((int)(__pyx_v_database-&gt;dimensions[0])));
-</pre><pre class="cython line score-2" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">108</span>:         <span class="o">&lt;</span><span class="nb">float</span><span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">database</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">],</span></pre>
+</pre><pre class="cython line score-2" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">105</span>:         <span class="o">&lt;</span><span class="nb">float</span><span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">database</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">],</span></pre>
 <pre class='cython code score-2 '>  __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = -1;
@@ -1542,9 +1524,9 @@ static PyObject *__pyx_pf_7py_simd_8cpp_calc_matrix(CYTHON_UNUSED PyObject *__py
   } else if (unlikely(__pyx_t_2 &gt;= __pyx_pybuffernd_database.diminfo[1].shape)) __pyx_t_3 = 1;
   if (unlikely(__pyx_t_3 != -1)) {
     <span class='pyx_c_api'>__Pyx_RaiseBufferIndexError</span>(__pyx_t_3);
-    <span class='error_goto'>__PYX_ERR(0, 108, __pyx_L1_error)</span>
+    <span class='error_goto'>__PYX_ERR(0, 105, __pyx_L1_error)</span>
   }
-</pre><pre class="cython line score-2" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">109</span>:         <span class="o">&lt;</span><span class="nb">float</span><span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">S_klm</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">],</span></pre>
+</pre><pre class="cython line score-2" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">106</span>:         <span class="o">&lt;</span><span class="nb">float</span><span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">S_klm</span><span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">,</span><span class="mf">0</span><span class="p">],</span></pre>
 <pre class='cython code score-2 '>  __pyx_t_4 = 0;
   __pyx_t_5 = 0;
   __pyx_t_6 = 0;
@@ -1563,16 +1545,16 @@ static PyObject *__pyx_pf_7py_simd_8cpp_calc_matrix(CYTHON_UNUSED PyObject *__py
   } else if (unlikely(__pyx_t_6 &gt;= __pyx_pybuffernd_S_klm.diminfo[2].shape)) __pyx_t_3 = 2;
   if (unlikely(__pyx_t_3 != -1)) {
     <span class='pyx_c_api'>__Pyx_RaiseBufferIndexError</span>(__pyx_t_3);
-    <span class='error_goto'>__PYX_ERR(0, 109, __pyx_L1_error)</span>
+    <span class='error_goto'>__PYX_ERR(0, 106, __pyx_L1_error)</span>
   }
-</pre><pre class="cython line score-0">&#xA0;<span class="">110</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">v_min</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">111</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">log_wG_min</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">112</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">log_wL_min</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">113</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">dv</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">114</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">dxG</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">115</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">dxL</span><span class="p">,</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">116</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">S_klm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">117</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">S_klm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">],</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">118</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">S_klm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">2</span><span class="p">],</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">119</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">database</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">107</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">v_min</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">108</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">log_wG_min</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">109</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">log_wL_min</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">110</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">dv</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">111</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">dxG</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">112</span>:         <span class="p">&lt;</span><span class="kt">float</span><span class="p">&gt;</span> <span class="n">dxL</span><span class="p">,</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">113</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">S_klm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">114</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">S_klm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">1</span><span class="p">],</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">115</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">S_klm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">2</span><span class="p">],</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">116</span>:         <span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;</span> <span class="n">database</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span></pre>
 </div></body></html>

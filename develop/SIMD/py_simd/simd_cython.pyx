@@ -45,7 +45,7 @@ def cpp_add_at32(np.ndarray[np.float32_t, ndim=3] S_klm,
         <int> S_klm.shape[2], 
         <int> values.shape[0])
 
-
+@cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)    
