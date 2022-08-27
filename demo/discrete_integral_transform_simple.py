@@ -1,3 +1,5 @@
+## Simple implementation with core functionality but no error corrections
+
 import numpy as np
 
 
