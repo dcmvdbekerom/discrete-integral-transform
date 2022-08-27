@@ -50,7 +50,11 @@ def cpp_add_at32(np.ndarray[np.float32_t, ndim=3] S_klm,
 @cython.wraparound(False)
 @cython.nonecheck(False)    
 def cy_calc_matrix( np.ndarray[np.float32_t, ndim=3] S_klm,
-                    np.ndarray[np.float32_t, ndim=2] database,
+                    #np.ndarray[np.float32_t, ndim=2] database,
+                    np.ndarray[np.float32_t, ndim=1] S0_arr,
+                    np.ndarray[np.float32_t, ndim=1] v0_arr,
+                    np.ndarray[np.float32_t, ndim=1] wG_arr,
+                    np.ndarray[np.float32_t, ndim=1] wL_arr,
                     float v_min, float log_wG_min, float log_wL_min, 
                     float dv, float dxG, float dxL):
     
@@ -60,16 +64,16 @@ def cy_calc_matrix( np.ndarray[np.float32_t, ndim=3] S_klm,
     cdef int Nv = <int> S_klm.shape[0], 
     cdef int NwG = <int> S_klm.shape[1], 
     cdef int NwL = <int> S_klm.shape[2], 
-    cdef int Nlines = <int> database.shape[0]
+    cdef int Nlines = <int> S0_arr.shape[0]
     
     cdef float S0i, v0i, wGi, wLi
 
     for i in range(Nlines):
     
-        S0i = database[i, 0]
-        v0i = database[i, 1]
-        wGi = database[i, 2]
-        wLi = database[i, 3]
+        S0i = S0_arr[i]
+        v0i = v0_arr[i]
+        wGi = wG_arr[i]
+        wLi = wL_arr[i]
   
         k = (v0i - v_min) / dv
         k0 = <int>k

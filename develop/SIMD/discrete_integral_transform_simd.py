@@ -110,22 +110,13 @@ def calc_matrix_cpp1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
 
 def calc_matrix_cy2(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
 
-    #Eventually this will be a pure cython function
-    Nlines = S0i.size
-    database = aligned_zeros((Nlines, 4), dtype=np.float32)
-    
-    database[:, 0] = S0i
-    database[:, 1] = v0i
-    database[:, 2] = log_wGi
-    database[:, 3] = log_wLi
-
     dv = (v[-1] - v[0]) / (v.size - 1)
     dxG = (log_wG[-1] - log_wG[0]) / (log_wG.size - 1)
     dxL = (log_wL[-1] - log_wL[0]) / (log_wL.size - 1)
     
-    S_klm = aligned_zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
+    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
 
-    cy_calc_matrix(S_klm, database,
+    cy_calc_matrix(S_klm, S0i, v0i, log_wGi, log_wLi,
                         v[0], log_wG[0], log_wL[0],
                         dv, dxG, dxL)
     
