@@ -2,6 +2,7 @@
 
 import numpy as np
 from time import perf_counter
+from py_simd.py_simd import add_at32
 
 def init_w_axis(dx, log_wi):
     log_w_min = np.min(log_wi)
@@ -13,14 +14,15 @@ def init_w_axis(dx, log_wi):
     
 def get_indices(arr_i, axis):
     pos   = np.interp(arr_i, axis, np.arange(axis.size))
-    index = pos.astype(int) 
-    return index, index + 1, pos - index 
+    index = pos.astype(int)
+    a = (pos - index).astype(np.float32)
+    return index, index + 1, a
 
 
 ## Calc matrix functions:
 
 def calc_matrix_py1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
-    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size))
+    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
     ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
     li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
     mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
@@ -33,6 +35,23 @@ def calc_matrix_py1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     np.add.at(S_klm, (ki1, li0, mi1), S0i *    avi  * (1-aGi) *    aLi )
     np.add.at(S_klm, (ki1, li1, mi0), S0i *    avi  *    aGi  * (1-aLi))
     np.add.at(S_klm, (ki1, li1, mi1), S0i *    avi  *    aGi  *    aLi )
+    return S_klm
+    
+    
+def calc_matrix_cy1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
+    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
+    ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
+    li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
+    mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
+
+    add_at32(S_klm, ki0, li0, mi0, S0i * (1-avi) * (1-aGi) * (1-aLi))
+    add_at32(S_klm, ki0, li0, mi1, S0i * (1-avi) * (1-aGi) *    aLi )
+    add_at32(S_klm, ki0, li1, mi0, S0i * (1-avi) *    aGi  * (1-aLi))
+    add_at32(S_klm, ki0, li1, mi1, S0i * (1-avi) *    aGi  *    aLi )
+    add_at32(S_klm, ki1, li0, mi0, S0i *    avi  * (1-aGi) * (1-aLi))
+    add_at32(S_klm, ki1, li0, mi1, S0i *    avi  * (1-aGi) *    aLi )
+    add_at32(S_klm, ki1, li1, mi0, S0i *    avi  *    aGi  * (1-aLi))
+    add_at32(S_klm, ki1, li1, mi1, S0i *    avi  *    aGi  *    aLi )
     return S_klm
 
 
@@ -60,17 +79,25 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i,
                         f_apply_transform=apply_transform_py1):
     
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
-    v0i, log_wGi, log_wLi, S0i = v0i[idx], log_wGi[idx], log_wLi[idx], S0i[idx]
+    
+    v0i = v0i[idx].astype(np.float32)
+    log_wGi = log_wGi[idx].astype(np.float32)
+    log_wLi = log_wLi[idx].astype(np.float32)
+    S0i = S0i[idx].astype(np.float32)
+
     log_wG = init_w_axis(dxG,log_wGi) #Eq 3.8
     log_wL = init_w_axis(dxL,log_wLi) #Eq 3.9
 
-    t0 = perf_counter()
+    t_list = []
+    t_list.append(perf_counter())
+    
     S_klm = f_calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i)
-    t1 = perf_counter()
-    print('Calc matrix:     {:10.3f} ms'.format((t1 - t0)*1e3))
-
-    t1 = perf_counter()
+    t_list.append(perf_counter())
+    
     I = f_apply_transform(v, log_wG, log_wL, S_klm)
-    t2 = perf_counter()
-    print('Apply transform: {:10.3f} ms'.format((t2 - t1)*1e3))
-    return I, S_klm
+    t_list.append(perf_counter())
+    
+    return I, S_klm, t_list
+
+if __name__ == '__main__':
+    import compare_functions
