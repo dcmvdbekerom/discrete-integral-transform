@@ -42,33 +42,33 @@ I2_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
                         f_apply_transform=apply_transform_py1)
 print('{:10.0f}\t{:10.0f}'.format((tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
 
-
-for i in range(5):
-    print('Baseline:      ',end='')
-    I_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
-                            f_calc_matrix=calc_matrix_py1,
-                            f_apply_transform=apply_transform_py1)
-    print('{:10.0f}\t{:10.0f}'.format(
-        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
-print('')
-
-for i in range(5):
-    print('Cython add_at: ', end='')
-    I_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
-                            f_calc_matrix=calc_matrix_cy1,
-                            f_apply_transform=apply_transform_py1)
-    print('{:10.0f}\t{:10.0f}'.format(
-        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
-print('')
-
-for i in range(5):
-    print('SIMD calc_matrix: ', end='')
-    I_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
-                            f_calc_matrix=calc_matrix_simd1,
-                            f_apply_transform=apply_transform_py1)
-    print('{:10.0f}\t{:10.0f}'.format(
-        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
-print('')
+##
+##for i in range(5):
+##    print('Baseline:         ',end='')
+##    I_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
+##                            f_calc_matrix=calc_matrix_py1,
+##                            f_apply_transform=apply_transform_py1)
+##    print('{:10.0f}\t{:10.0f}'.format(
+##        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
+##print('')
+##
+##for i in range(5):
+##    print('Cython add_at:    ', end='')
+##    I_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
+##                            f_calc_matrix=calc_matrix_cy1,
+##                            f_apply_transform=apply_transform_py1)
+##    print('{:10.0f}\t{:10.0f}'.format(
+##        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
+##print('')
+##
+##for i in range(5):
+##    print('SIMD calc_matrix: ', end='')
+##    I_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i,
+##                            f_calc_matrix=calc_matrix_simd1,
+##                            f_apply_transform=apply_transform_py1)
+##    print('{:10.0f}\t{:10.0f}'.format(
+##        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
+##print('')
 
 
 plt.axhline(0,c='k')
