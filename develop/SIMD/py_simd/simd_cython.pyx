@@ -53,22 +53,21 @@ def cpp_add_at32(np.ndarray[np.float32_t, ndim=3] S_klm,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False) 
-def cy_multiply_lineshape(np.ndarray[np.complex64_t, ndim=3] S,
-                            np.ndarray[np.float32_t, ndim=1] v, 
-                            np.ndarray[np.float32_t, ndim=1]log_wG, 
-                            np.ndarray[np.float32_t, ndim=1]log_wL):
+def cy_multiply_lineshape(np.ndarray[np.complex64_t, ndim=3] S_klm_FT, 
+                            float dv,
+                            np.ndarray[np.float32_t, ndim=1] log_wG, 
+                            np.ndarray[np.float32_t, ndim=1] log_wL,
+                            ):
 
-    cdef int Nx  = <int>S.shape[0]
-    cdef int Nv  = Nx - 1
-    cdef int NwG = <int>S.shape[1]
-    cdef int NwL = <int>S.shape[2]
+    cdef int Nx  = <int>S_klm_FT.shape[0]
+    cdef int NwG = <int>S_klm_FT.shape[1]
+    cdef int NwL = <int>S_klm_FT.shape[2]
 
-    cdef float dv = v[1] - v[0]
     cdef float pi = 3.141592653589793
     cdef float log2 = 0.6931471805599453
-    cdef float x_step = 1 / (2 * dv * Nv)
+    cdef float x_step = 1 / (2 * dv * (Nx - 1))
 
-    cdef np.ndarray[np.complex64_t, ndim=1] S_k_FT = np.zeros(S.shape[0], dtype=np.complex64)
+    cdef np.ndarray[np.complex64_t, ndim=1] S_k_FT = np.zeros(Nx, dtype=np.complex64)
     
     cdef float x_k, wG_l, wL_m, gV_FT
     cdef int k,l,m
@@ -80,7 +79,7 @@ def cy_multiply_lineshape(np.ndarray[np.complex64_t, ndim=3] S,
             for k in range(Nx):
                 x_k = k * x_step
                 gV_FT = expf(-((pi*wG_l*x_k)**2/(4*log2) + pi*wL_m*x_k))
-                S_k_FT[k] = S_k_FT[k] + S[k,l,m] * gV_FT        
+                S_k_FT[k] = S_k_FT[k] + S_klm_FT[k,l,m] * gV_FT        
     
     return S_k_FT / dv
         
