@@ -2,7 +2,14 @@
 
 import numpy as np
 from time import perf_counter
-from py_simd.py_simd import cy_add_at32, cpp_add_at32, cpp_calc_matrix, cy_calc_matrix
+from py_simd.py_simd import (
+    cy_add_at32,
+    cpp_add_at32,
+    cpp_calc_matrix,
+    cy_calc_matrix,
+    cy_multiply_lineshape)
+import pyfftw
+from scipy.fft import rfft, irfft
 
 def aligned_zeros(shape, alignment=32, dtype=np.float32, order='c', **kwargs):
     N = np.prod(shape)
@@ -18,7 +25,7 @@ def init_w_axis(dx, log_wi):
     log_w_max = np.max(log_wi) + 1e-4
     N = np.ceil((log_w_max - log_w_min)/dx) + 1
     log_w_arr = log_w_min + dx * np.arange(N)
-    return log_w_arr
+    return log_w_arr.astype(np.float32)
  
     
 def get_indices(arr_i, axis):
@@ -188,8 +195,67 @@ def apply_transform_py1(v, log_wG, log_wL, S_klm):
             
     return np.fft.irfft(S_k_FT)[:v.size] / dv
 
+def apply_transform_py2(fft_fwd, fft_rev, v, log_wG, log_wL, S_klm):
+
+    
+
+    fft_fwd.input_array[:] = S_klm
+    t0 = perf_counter()
+##    S_klm_out = rfft(S_klm, axis=0, overwrite_x=True)
+    S_klm_out = fft_fwd()
+    t1 = perf_counter()
+    S_k_FT = cy_multiply_lineshape(S_klm_out, v, log_wG, log_wL)
+    t2 = perf_counter()
+    print('{:10.0f}\t{:10.0f}'.format((t1 - t0)*1e3, (t2 - t1)*1e3))
+
+    return np.fft.irfft(S_k_FT)[:v.size]
+##    fft_rev.input_array[:] = S_k_FT
+##    S_k_out = fft_rev()
+##    return S_k_out[:v.size]
+    
+
 
 ## Synthesizie_spectrum function:
+
+def plan_FFTW(v, log_wGi, log_wLi, dxG = 0.1, dxL = 0.1, wisdom_file='wisdom.txt', patience='FFTW_ESTIMATE'):
+    pyfftw.config.NUM_THREADS = 8
+    #pyfftw.config.PLANNER_EFFORT = 'FFTW_MEASURE' #'FFTW_MEASURE'
+
+    try:
+        with open(wisdom_file,'r') as f:
+            txt = f.read()
+        wisdom = tuple(txt.encode().split(b'\n###\n'))
+        pyfftw.import_wisdom(wisdom)
+    except(IOError, IndexError):
+        pass
+
+    log_wG = init_w_axis(dxG,log_wGi) #Eq 3.8
+    log_wL = init_w_axis(dxL,log_wLi) #Eq 3.9
+
+    Nv = v.size
+    NwG = log_wG.size
+    NwL = log_wL.size
+    
+
+    S_klm_in  = pyfftw.empty_aligned((2*Nv,   NwG, NwL), dtype='float32')
+    S_klm_out = pyfftw.empty_aligned((Nv + 1, NwG, NwL), dtype='complex64')
+    fft_fwd   = pyfftw.FFTW(S_klm_in, S_klm_out, axes=(0,), flags=(patience,))
+
+    fft_rev = None
+    
+##    S_k_in    = pyfftw.empty_aligned( Nv + 1, dtype='complex64')
+##    S_k_out   = pyfftw.empty_aligned( 2*Nv,   dtype='float32')
+##    fft_rev   = pyfftw.FFTW(S_k_in, S_k_out, flags=(patience,), direction='FFTW_BACKWARD')
+
+    wisdom = pyfftw.export_wisdom()
+    with open(wisdom_file,'w') as f:
+        f.write(b'\n###\n'.join(wisdom).decode())
+
+
+    print(Nv, NwG, NwL)
+
+    return fft_fwd, fft_rev, wisdom
+
 
 def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i,
                         dxG = 0.1, dxL = 0.1,
