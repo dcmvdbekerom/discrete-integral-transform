@@ -1,0 +1,32 @@
+(fftw-3.3.5 fftw_wisdom #x3c273403 #x192df114 #x4d08727c #xe98e9b9d
+)
+
+###
+(fftw-3.3.5 fftwf_wisdom #x706526c0 #x2f8b6c85 #x8cd1bb1a #x7c96e03d
+  (fftwf_dft_vrank_geq1_register 0 #x1040 #x1040 #x0 #x065e6f39 #x36ab1381 #xcd1621bf #x8d0324ca)
+  (fftwf_codelet_t1fv_7_sse2 0 #x1040 #x1040 #x0 #x3e9ac84a #x2684b598 #x8682a1c1 #x77bf84eb)
+  (fftwf_codelet_t1fv_3_sse2 0 #x1040 #x1040 #x0 #xab120220 #xbaeabeeb #x0250d24a #xbf438de7)
+  (fftwf_dft_nop_register 0 #x1040 #x1040 #x0 #x686d833e #xc708eb5d #x6fe56666 #x309c4c08)
+  (fftwf_rdft_rank0_register 3 #x1040 #x1040 #x0 #x062e21d6 #x730e32da #x4c8e5bb1 #x6c66a32b)
+  (fftwf_codelet_r2cfII_32 2 #x1040 #x1040 #x0 #x20a5d4a1 #x9a9d98d9 #xef7f7f58 #x460e7e0c)
+  (fftwf_dft_vrank_geq1_register 0 #x1040 #x1040 #x0 #xdddbcede #x3a6f09b2 #x31448fc3 #xcdef79ab)
+  (fftwf_codelet_hc2cfdftv_32_avx 0 #x1040 #x1040 #x0 #x8f716703 #xfa228d3e #x8837dbcc #x23ab191c)
+  (fftwf_rdft_vrank_geq1_register 1 #x1040 #x1040 #x0 #x1746f1f1 #x9afdbd36 #x6f17fd9e #x1ccee2a5)
+  (fftwf_dft_r2hc_register 0 #x1040 #x1040 #x0 #x8e424c34 #x7b9c0b99 #x66edc1c6 #xc80c984f)
+  (fftwf_dft_vrank_geq1_register 0 #x1040 #x1040 #x0 #xb6ab3a12 #x04d682ce #x957d3b25 #xdb8d1b6c)
+  (fftwf_rdft_vrank_geq1_register 1 #x1040 #x1040 #x0 #xfed6ba74 #xfc8020d7 #xbe6dc152 #x7515b204)
+  (fftwf_codelet_n1fv_11_avx 0 #x1440 #x1440 #x0 #xaaa3e00e #xc36278ad #x056e6bcb #x335cbd86)
+  (fftwf_dft_r2hc_register 0 #x1040 #x1040 #x0 #xab4e5604 #x7ed4a1e0 #x5e028921 #x2a25116c)
+  (fftwf_codelet_t1fuv_6_sse2 0 #x1040 #x1040 #x0 #x01dc4232 #x78e5c949 #x9232ae72 #x9b835df1)
+  (fftwf_dft_vrank_geq1_register 1 #x1440 #x1440 #x0 #x47cb703c #x9b4cae9f #x19d29675 #xdedbb4e2)
+  (fftwf_dft_vrank_geq1_register 0 #x1040 #x1040 #x0 #x06b113e1 #xf194e717 #xf80385a9 #xe0888fa2)
+  (fftwf_dft_indirect_register 0 #x1040 #x1040 #x0 #xa9b8cbde #xb0abcde1 #xa87f25ca #xea543ed7)
+  (fftwf_dft_buffered_register 0 #x1040 #x1040 #x0 #xeba4ee43 #xbdcef5b3 #x220f1642 #x1691cdab)
+  (fftwf_codelet_r2cf_32 2 #x1040 #x1040 #x0 #xc8d9fa1d #x964dc72e #x4c0a5da2 #x47a2d3fc)
+  (fftwf_codelet_t1fv_9_sse2 0 #x1040 #x1040 #x0 #xc76064c7 #x1948e882 #xefb2bd95 #x508f13e2)
+  (fftwf_rdft_rank0_register 3 #x1040 #x1040 #x0 #xfba3554d #x05b00cb9 #x3e19b60a #x5243f80f)
+)
+
+###
+(fftw-3.3.5 fftwl_wisdom #x0821b5c7 #xa4c07d5a #x21b58211 #xebe513ab
+)
