@@ -276,7 +276,7 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i,
     log_wG = init_w_axis(dxG,log_wGi) #Eq 3.8
     log_wL = init_w_axis(dxL,log_wLi) #Eq 3.9
 
-    plan_FFTW(v.size, log_wG.size, log_wL.size, patience='FFTW_EXHAUSTIVE')
+    plan_FFTW(v.size, log_wG.size, log_wL.size, patience='FFTW_PATIENT')
     if plan_only:
         return
     
