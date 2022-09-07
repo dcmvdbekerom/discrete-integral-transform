@@ -25,7 +25,7 @@ v0_arr, da_arr = np.load('CO2_hitemp.npy')[:2]
 _,log_wG_arr,log_wL_arr,S0_arr = calc_stick_spectrum(p,T)
 print('{:.2f}M lines loaded...'.format(len(v0_arr)*1e-6))
 
-Nlen = 5000
+Nlen = -1#5000
 
 S0_arr = S0_arr[:Nlen]
 v0_arr = v0_arr[:Nlen]
@@ -38,8 +38,8 @@ da_max = np.max(da_arr)
 vi_arr = v0_arr + p*da_arr
 
 
-dxG = 0.1
-dxL = 0.4
+dxG = 0.05
+dxL = 0.1
 
 log_wG = init_w_axis(dxG,log_wG_arr)
 log_wL = init_w_axis(dxL,log_wL_arr)
@@ -94,15 +94,16 @@ circ_mask = circ_buffer_size - 1 #if spread len is 0b01000, circ_mask is 0b00111
 
 S_circ = np.zeros((circ_buffer_size,NwG,NwL))
 S_klm = np.zeros((block_size,NwG,NwL))
-S_klm_ref = np.zeros((block_size,NwG,NwL))
+S_klm_ref = np.zeros((2*Nv,NwG,NwL))
 
-iv_old = 0
+latest_line = np.zeros((NwG,NwL), dtype=int)
+cum_skip = np.zeros((NwG,NwL), dtype=int)
 
 print(vi_arr[0], vi_arr[-1])
 print(spread_size, lineshape_size, block_size)
 
 indices = []
-
+iv_old = 0
 for il in range(len(v0_arr)):
 
     v0i = v0_arr[il]
@@ -112,9 +113,6 @@ for il in range(len(v0_arr)):
         k = iv_old + k_diff_min
         iv_step = iv - iv_old
 
-##        print(sorted(set(indices)))
-##        print('iv=:',iv,'iv_old=',iv_old,'k=',k,'\t',end='')
-        
         for j in range(np.min((iv_step, spread_size))):
             kj = k + j
             kj_c = kj & circ_mask
@@ -123,10 +121,17 @@ for il in range(len(v0_arr)):
                 for m in range(NwL):
                     
                     val_klm = S_circ[kj_c, l, m]
-                    
                     if val_klm != 0.0:
-                        S_klm[kj, l, m] = val_klm 
+
+                        if kj - latest_line[l,m] > lineshape_size:
+                            cum_skip[l,m] += kj - latest_line[l,m] - lineshape_size
+                            print(l,m,'moved a line!')
+                            # TO-DO: update skip_index_arr
+                            
+                        kj_adj = kj - cum_skip[l,m]
+                        S_klm[kj_adj, l, m] = val_klm 
                         S_circ[kj_c, l, m] = 0.0
+                        latest_line[l, m] = kj
 
         iv_old = iv
         indices = []
@@ -189,16 +194,13 @@ S_klm_ref0 = np.sum(np.sum(S_klm_ref,axis=2),axis=1)
 ##                        S0_arr[valid])
 
 
-##plt.plot(v_arr[:S_klm_ref.shape[0]],S_klm_ref[:,0,0])
+plt.plot(v_arr[:S_klm.shape[0]],S_klm_ref[:S_klm.shape[0],0,0])
 ##plt.plot(v_arr,S_klm_ref2[:v_arr.size,0,0],'k--')
-##plt.plot(v_arr[:S_klm.shape[0]], S_klm[:,0,0]-S_klm_ref[:,0,0],'o-')
+plt.plot(v_arr[:S_klm.shape[0]], S_klm[:,0,0],'k--')
 
 
-plt.plot(S_klm[:,0,0]-S_klm_ref[:,0,0],'o-')
+##plt.plot(S_klm[:,0,0]-S_klm_ref[:S_klm.shape[0],0,0],'o-')
 
-##plt.plot(v_arr,S_klm_ref0[:v_arr.size])
-##plt.plot(v_arr[:S_klm0.shape[0]], S_klm0,'k--')
-
-##plt.xlim(v_arr[0],v_arr[0]+0.1)
+plt.xlim(v0_arr[0],v0_arr[-1])
 plt.show()
 
