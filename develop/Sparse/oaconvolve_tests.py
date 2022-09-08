@@ -14,13 +14,12 @@ def sparse_convolve(S_arr, y_ls):
     idx = np.arange(S_arr.size)[S_arr != 0.0]
     for i in idx:
         S_out[i:i+y_ls.size] += S_arr[i]*y_ls
-    i0 = (y_ls.size - 1)//2 + 1
+    i0 = (y_ls.size + 1)//2 - 1
     return S_out[i0:i0 + S_arr.size]   
 
 
 def my_oaconvolve(S_arr, ls, method='auto', mode='same'):
     block_size, overlap, in1_step, in2_step = calc_oa_lens(S_arr.size, ls.size)
-    
     N = int(np.ceil(S_arr.size/in1_step))
     output = np.zeros(N*block_size)
 
@@ -42,18 +41,24 @@ def my_oaconvolve(S_arr, ls, method='auto', mode='same'):
     i0 = (ls.size - 1)//2
     i1 = i0 + S_arr.size
     return output[i0:i1]
-        
+
+
 
 dv = 0.1
 trunc = 5.0 #cm-1
 
-Nls = 100
+Nls = 1000
 v_ls = np.arange(-Nls,Nls+1)*dv
 y_ls = gL(v_ls,0,1.0)
 
-Nl = 200000
+
+Nl = 200
 Nv = 200000
 
+
+block_size, overlap, in1_step, in2_step = calc_oa_lens(Nv, y_ls.size)
+print(y_ls.size, block_size, Nv)
+print(block_size/y_ls.size)
 
 np.random.seed(0)
 S0_arr = np.random.rand(Nl)
@@ -67,7 +72,7 @@ f_dict = {#'direct': partial(convolve, mode='same', method='direct'),
           'oa': partial(oaconvolve, mode='same'),
           'my_oa_fft': partial(my_oaconvolve, mode='same', method='fft'),
           #'my_oa_dir': partial(my_oaconvolve, mode='same', method='direct'),
-          #'sparse':sparse_convolve,
+          'sparse':sparse_convolve,
           }
 
 
