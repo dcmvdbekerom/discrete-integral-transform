@@ -28,9 +28,9 @@ cpdef _direct_summation(np.ndarray[float_t, ndim=1] block,
                        np.ndarray[float_t, ndim=1] lineshape,
                        ):
                       
-    cdef int i, j
-    cdef int s1 = block.shape[0]
-    cdef int s2 = lineshape.shape[0]
+    cdef unsigned long int i, j
+    cdef unsigned long int s1 = block.shape[0]
+    cdef unsigned long int s2 = lineshape.shape[0]
     cdef np.ndarray[float_t, ndim=1] output = np.zeros(s1 + s2)
 
     for i in range(s1):
@@ -47,8 +47,8 @@ cpdef _direct_summation(np.ndarray[float_t, ndim=1] block,
 @cython.wraparound(False)
 @cython.nonecheck(False)
 cpdef _count_non_zero(np.ndarray[float_t, ndim=1] arr):
-    cdef int i = 0
-    cdef int n = 0
+    cdef unsigned long int i = 0
+    cdef unsigned long int n = 0
     for i in range(arr.shape[0]):
         if arr[i]:
             n += 1

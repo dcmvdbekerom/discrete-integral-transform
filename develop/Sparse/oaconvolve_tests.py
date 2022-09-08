@@ -56,7 +56,7 @@ def my_oaconvolve(S_arr, ls, method='auto', mode='same'):
 
 
 
-dv = 0.002
+dv = 0.01
 trunc = 50.0 #cm-1
 
 Nls = trunc/dv
@@ -65,10 +65,13 @@ y_ls = gL(v_ls,0,1.0)
 
 
 Nv = 5000000
-Nl = Nv//50
-
-
 block_size, overlap, in1_step, in2_step = calc_oa_lens(Nv, y_ls.size)
+
+
+Nl = Nv//100
+
+
+
 print(y_ls.size, block_size, Nv)
 print(block_size/y_ls.size)
 
@@ -101,7 +104,7 @@ for i, key in enumerate(f_dict.keys()):
     Sc = f(S_arr, y_ls*dv)
     print('{:20s}: {:.6f}'.format(key, perf_counter()-t0))
     
-    plt.plot(Sc, lw = 1+2*i, zorder = -i, label=key)
+    plt.plot(Sc[:100000], lw = 1+2*i, zorder = -i, label=key)
     
 plt.legend(loc=0)
 plt.show()
