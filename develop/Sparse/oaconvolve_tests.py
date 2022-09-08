@@ -5,6 +5,18 @@ from scipy.signal._signaltools import _calc_oa_lens as calc_oa_lens
 from numpy import pi
 from time import perf_counter
 from functools import partial
+import sys
+sys.path.append('py_sparse/')
+from py_sparse import _direct_summation, _count_non_zero
+
+def time_it(f_in,*vargs,**kwargs):
+
+    def f_out(*vargs, **kwargs):
+        t0 = perf_counter()
+        f_in(*vargs,**kwargs)
+        print(perf_counter() - t0)
+
+    return f_out
 
 gL  = lambda v,v0,w: 2/(pi*w) * 1 / (1 + 4*((v-v0)/w)**2)
 
@@ -44,16 +56,16 @@ def my_oaconvolve(S_arr, ls, method='auto', mode='same'):
 
 
 
-dv = 0.1
-trunc = 5.0 #cm-1
+dv = 0.002
+trunc = 50.0 #cm-1
 
-Nls = 1000
+Nls = trunc/dv
 v_ls = np.arange(-Nls,Nls+1)*dv
 y_ls = gL(v_ls,0,1.0)
 
 
-Nl = 200
-Nv = 200000
+Nv = 5000000
+Nl = Nv//50
 
 
 block_size, overlap, in1_step, in2_step = calc_oa_lens(Nv, y_ls.size)
@@ -67,12 +79,19 @@ S_arr = np.zeros(Nv)
 S_arr[k0_arr] = S0_arr
 
 
+t0 = perf_counter()
+res = _count_non_zero(S_arr)
+print('{:20d}: {:.6f}'.format(res, perf_counter()-t0))
+
+
+
 f_dict = {#'direct': partial(convolve, mode='same', method='direct'),
           #'fft': partial(convolve, mode='same', method='fft'),
           'oa': partial(oaconvolve, mode='same'),
           'my_oa_fft': partial(my_oaconvolve, mode='same', method='fft'),
           #'my_oa_dir': partial(my_oaconvolve, mode='same', method='direct'),
-          'sparse':sparse_convolve,
+          'cy_ds':_direct_summation,
+          'py_ds':sparse_convolve,
           }
 
 
