@@ -12,6 +12,36 @@ from scipy.special import lambertw
 from scipy.fft import next_fast_len
 from scipy.signal._signaltools import _calc_oa_lens
 
+ctypedef fused float_t:
+    np.float32_t
+    np.float64_t
+
+ctypedef fused complex_t:
+    np.complex64_t
+    np.complex128_t
+    
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef _direct_summation(np.ndarray[float_t, ndim=1] block, 
+                       np.ndarray[float_t, ndim=1] linshape
+                       int offset,
+                       np.ndarray[float_t, ndim=1] output,
+                       ):
+                      
+    cdef int i, j
+    for i in range(block.size):
+        if bloxk[i]:
+            for j in range(linshape.size):
+                output[i + j + offset] += block[i] * lineshape[j] 
+
+cdef _non_zero_count(np.ndarray[float_t, ndim=1] arr):
+    cdef int i = 0
+    cdef int n = 0
+    for i in range(arr.size):
+        if arr[i]:
+            n += 1
+    return n
 
 
 def convolve_and_add_to_output():
