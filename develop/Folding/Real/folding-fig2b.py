@@ -138,6 +138,7 @@ ax[0].axvline(0,c='k',ls='--')
 ax[0].plot(v_arr, I_err, 'r', lw=1, label = 'Real error')
 ax[0].plot(v_arr, I_IDFT_err,'b--', label='Direct summation')
 ax[0].plot(v_arr, I_err_ex,'k-.', label='Approximation')
+ax[0].legend(loc=0)
 
 ax[1].set_title('FT space')
 ax[1].axhline(0,c='k',ls='--')
