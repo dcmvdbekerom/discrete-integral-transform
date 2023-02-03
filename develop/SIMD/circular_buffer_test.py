@@ -3,7 +3,7 @@ sys.path.append('../../demo')
 import numpy as np
 import matplotlib.pyplot as plt
 from HITEMP_spectra import load_HITRAN, init_database, calc_stick_spectrum
-from discrete_integral_transform_sparse import init_w_axis, calc_matrix
+from discrete_integral_transform_simd import init_w_axis
 from functools import partial
 from scipy.signal._signaltools import _calc_oa_lens
 import pyfftw
