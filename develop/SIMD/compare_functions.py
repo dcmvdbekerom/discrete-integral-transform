@@ -43,7 +43,7 @@ dxL = 0.1
 
 synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i, dxG=dxG, dxL=dxL, plan_only=True)
 
-for i in range(1):
+for i in range(5):
     print('Baseline:  ',end='')
     I1_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i, dxG=dxG, dxL=dxL,
                             f_calc_matrix=calc_matrix_cy2,
@@ -57,8 +57,9 @@ for i in range(5):
     I2_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i, dxG=dxG, dxL=dxL,
                             f_calc_matrix=calc_matrix_cy2,
                             f_apply_transform=apply_transform_py2)
-    print('{:4.0f}, {:4.0f}'.format(
-        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
+    
+    print('{:4.0f}, {:4.0f} -- '.format(
+        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3), end='')
 print('')
 
 ##for i in range(5):
