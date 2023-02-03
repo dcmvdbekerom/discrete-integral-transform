@@ -1,8 +1,8 @@
 import numpy as np
 from time import perf_counter
 from add_module import numpy_add_at, cython_add_at
-from numba import jit
-from numba import vectorize, int32, float64
+#from numba import jit
+#from numba import vectorize, int32, float64
 
 Nv = 300000
 NG =  4
