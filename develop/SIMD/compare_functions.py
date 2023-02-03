@@ -8,6 +8,7 @@ import pyfftw
 from discrete_integral_transform_simd import (
     calc_matrix_py1,
     calc_matrix_py2,
+    calc_matrix_cy0,
     calc_matrix_cy1,
     calc_matrix_cy2,
     calc_matrix_cpp1,
@@ -33,7 +34,20 @@ v_arr = np.arange(v_min,v_max,dv, dtype=np.float32) #cm-1
 T = 1500.0 #K
 p =    0.1 #bar
 
-v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
+
+v0i, dai = np.load('CO2_hitemp.npy')[:2]
+_,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
+##v0i,log_wGi,log_wLi,S0i = calc_stick_spectrum(p,T)
+
+da_min = np.min(dai)
+da_max = np.max(dai)
+v_diff_min, v_diff_max = p * da_min, p * da_max
+k_diff_min, k_diff_max = int(np.floor(v_diff_min / dv)), int(np.ceil(v_diff_max / dv))
+spread_size = k_diff_max - k_diff_min + 1 + 1 # +1 to accomodate k0 + 1
+extra_params = [dai, p, k_diff_min, spread_size]
+
+
+
 print('{:.2f}M lines loaded...'.format(len(v0i)*1e-6))
 
 ##with open('wisdom.txt','r') as f:
@@ -41,13 +55,15 @@ print('{:.2f}M lines loaded...'.format(len(v0i)*1e-6))
 dxG = 0.1
 dxL = 0.1
 
-synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i, dxG=dxG, dxL=dxL, plan_only=True)
+##synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i, dxG=dxG, dxL=dxL, extra_params=extra_params, plan_only=True)
 
 for i in range(5):
     print('Baseline:  ',end='')
     I1_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i, dxG=dxG, dxL=dxL,
-                            f_calc_matrix=calc_matrix_cy2,
-                            f_apply_transform=apply_transform_py1)
+                                            f_calc_matrix=calc_matrix_cy1,
+                                            f_apply_transform=apply_transform_py1,
+                                            extra_params=extra_params,
+                                            )
     print('{:4.0f}, {:4.0f}'.format(
         (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
 print('')
@@ -55,11 +71,13 @@ print('')
 for i in range(5):
     print('Cython:    ', end='')
     I2_arr, S_klm, tl = synthesize_spectrum(v_arr, v0i, log_wGi, log_wLi, S0i, dxG=dxG, dxL=dxL,
-                            f_calc_matrix=calc_matrix_cy2,
-                            f_apply_transform=apply_transform_py2)
+                                            f_calc_matrix=calc_matrix_cy2,
+                                            f_apply_transform=apply_transform_py2,
+                                            extra_params=extra_params,
+                                            )
     
     print('{:4.0f}, {:4.0f} -- '.format(
-        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3), end='')
+        (tl[1] - tl[0])*1e3, (tl[2] - tl[1])*1e3))
 print('')
 
 ##for i in range(5):

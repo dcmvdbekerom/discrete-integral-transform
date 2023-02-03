@@ -6,7 +6,9 @@ from py_simd.py_simd import (
     cy_add_at32,
     cpp_add_at32,
     cpp_calc_matrix,
-    cy_calc_matrix,
+    cy0_calc_matrix,
+    cy1_calc_matrix,
+    cy2_calc_matrix,
     cy_multiply_lineshape)
 import pyfftw
 from scipy.fft import rfft, irfft
@@ -84,21 +86,21 @@ def calc_matrix_py2(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     return S_klm
 
     
-def calc_matrix_cy1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
-    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
-    ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
-    li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
-    mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
-
-    cy_add_at32(S_klm, ki0, li0, mi0, S0i * (1-avi) * (1-aGi) * (1-aLi))
-    cy_add_at32(S_klm, ki0, li0, mi1, S0i * (1-avi) * (1-aGi) *    aLi )
-    cy_add_at32(S_klm, ki0, li1, mi0, S0i * (1-avi) *    aGi  * (1-aLi))
-    cy_add_at32(S_klm, ki0, li1, mi1, S0i * (1-avi) *    aGi  *    aLi )
-    cy_add_at32(S_klm, ki1, li0, mi0, S0i *    avi  * (1-aGi) * (1-aLi))
-    cy_add_at32(S_klm, ki1, li0, mi1, S0i *    avi  * (1-aGi) *    aLi )
-    cy_add_at32(S_klm, ki1, li1, mi0, S0i *    avi  *    aGi  * (1-aLi))
-    cy_add_at32(S_klm, ki1, li1, mi1, S0i *    avi  *    aGi  *    aLi )
-    return S_klm
+##def calc_matrix_cy1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
+##    S_klm = np.zeros((2 * v.size, log_wG.size, log_wL.size), dtype=np.float32)
+##    ki0, ki1, avi = get_indices(v0i, v)          #Eqs 3.4 & 3.6
+##    li0, li1, aGi = get_indices(log_wGi, log_wG) #Eqs 3.7 & 3.10
+##    mi0, mi1, aLi = get_indices(log_wLi, log_wL) #Eqs 3.7 & 3.10
+##
+##    cy_add_at32(S_klm, ki0, li0, mi0, S0i * (1-avi) * (1-aGi) * (1-aLi))
+##    cy_add_at32(S_klm, ki0, li0, mi1, S0i * (1-avi) * (1-aGi) *    aLi )
+##    cy_add_at32(S_klm, ki0, li1, mi0, S0i * (1-avi) *    aGi  * (1-aLi))
+##    cy_add_at32(S_klm, ki0, li1, mi1, S0i * (1-avi) *    aGi  *    aLi )
+##    cy_add_at32(S_klm, ki1, li0, mi0, S0i *    avi  * (1-aGi) * (1-aLi))
+##    cy_add_at32(S_klm, ki1, li0, mi1, S0i *    avi  * (1-aGi) *    aLi )
+##    cy_add_at32(S_klm, ki1, li1, mi0, S0i *    avi  *    aGi  * (1-aLi))
+##    cy_add_at32(S_klm, ki1, li1, mi1, S0i *    avi  *    aGi  *    aLi )
+##    return S_klm
 
 
 def calc_matrix_cpp1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
@@ -118,7 +120,10 @@ def calc_matrix_cpp1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     return S_klm
 
 
-def calc_matrix_cy2(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
+def calc_matrix_cy0(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, extra_params=[]):
+
+    dai, p, _, _ = extra_params
+    vii = v0i + p*dai
 
     dv = (v[-1] - v[0]) / (v.size - 1)
     dxG = (log_wG[-1] - log_wG[0]) / (log_wG.size - 1)
@@ -126,11 +131,61 @@ def calc_matrix_cy2(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
     
     S_klm = np.zeros(fft_fwd.input_array.shape, dtype=np.float32)
 
-    cy_calc_matrix(S_klm, S0i, v0i, log_wGi, log_wLi,
+    cy0_calc_matrix(S_klm, S0i, vii, log_wGi, log_wLi,
                         v[0], log_wG[0], log_wL[0],
                         dv, dxG, dxL)
+    return S_klm
+
+
+def calc_matrix_cy1(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, extra_params=[]):
+
+    dai, p, _, _ = extra_params
+
+    dv = (v[-1] - v[0]) / (v.size - 1)
+    dxG = (log_wG[-1] - log_wG[0]) / (log_wG.size - 1)
+    dxL = (log_wL[-1] - log_wL[0]) / (log_wL.size - 1)
+    
+    S_klm = np.zeros(fft_fwd.input_array.shape, dtype=np.float32)
+
+    cy1_calc_matrix(S_klm,
+                    S0i,
+                    v0i,
+                    dai,
+                    log_wGi,
+                    log_wLi,
+                    p,
+                    v[0], log_wG[0], log_wL[0],
+                    dv, dxG, dxL)
     
     return S_klm
+#extra params: dai, p
+
+
+def calc_matrix_cy2(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, extra_params=[]):
+
+    dai, p, k_diff_min, spread_size = extra_params
+       
+
+    dv = (v[-1] - v[0]) / (v.size - 1)
+    dxG = (log_wG[-1] - log_wG[0]) / (log_wG.size - 1)
+    dxL = (log_wL[-1] - log_wL[0]) / (log_wL.size - 1)
+    
+    S_klm = np.zeros(fft_fwd.input_array.shape, dtype=np.float32)
+
+    cy2_calc_matrix(S_klm,
+                    S0i,
+                    v0i,
+                    dai,
+                    log_wGi,
+                    log_wLi,
+                    p,
+                    v[0], log_wG[0], log_wL[0],
+                    dv, dxG, dxL,
+                    k_diff_min, spread_size)
+    
+    return S_klm
+#extra params: dai, p, k_diff_min, spread_size
+
 
 
 def calc_matrix_cpp2(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i):
@@ -264,10 +319,11 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i,
                         dxG = 0.1, dxL = 0.1,
                         f_calc_matrix=calc_matrix_py1,
                         f_apply_transform=apply_transform_py1,
+                        extra_params=[],
                         plan_only=False):
     
     idx = (v0i >= np.min(v)) & (v0i < np.max(v))
-    
+    ep2 = [extra_params[0][idx], *extra_params[1:]]
     v0i = v0i[idx].astype(np.float32)
     log_wGi = log_wGi[idx].astype(np.float32)
     log_wLi = log_wLi[idx].astype(np.float32)
@@ -283,7 +339,7 @@ def synthesize_spectrum(v, v0i, log_wGi, log_wLi, S0i,
     t_list = []
     t_list.append(perf_counter())
     
-    S_klm = f_calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i)
+    S_klm = f_calc_matrix(v, log_wG, log_wL, v0i, log_wGi, log_wLi, S0i, extra_params=ep2)
     t_list.append(perf_counter())
     
     I = f_apply_transform(v, log_wG, log_wL, S_klm)
