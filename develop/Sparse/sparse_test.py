@@ -25,7 +25,7 @@ v0_arr, da_arr = np.load('CO2_hitemp.npy')[:2]
 _,log_wG_arr,log_wL_arr,S0_arr = calc_stick_spectrum(p,T)
 print('{:.2f}M lines loaded...'.format(len(v0_arr)*1e-6))
 
-Nlen = -1#5000
+Nlen = 5000
 
 S0_arr = S0_arr[:Nlen]
 v0_arr = v0_arr[:Nlen]
@@ -38,8 +38,8 @@ da_max = np.max(da_arr)
 vi_arr = v0_arr + p*da_arr
 
 
-dxG = 0.05
-dxL = 0.1
+dxG = 0.1
+dxL = 0.4
 
 log_wG = init_w_axis(dxG,log_wG_arr)
 log_wL = init_w_axis(dxL,log_wL_arr)
@@ -92,12 +92,16 @@ spread_size = k_diff_max - k_diff_min + 1 + 1 # +1 to accomodate k0 + 1
 circ_buffer_size = int(2**np.ceil(np.log2(spread_size)))
 circ_mask = circ_buffer_size - 1 #if spread len is 0b01000, circ_mask is 0b00111
 
-S_circ = np.zeros((circ_buffer_size,NwG,NwL))
-S_klm = np.zeros((block_size,NwG,NwL))
-S_klm_ref = np.zeros((2*Nv,NwG,NwL))
+S_circ = np.zeros((circ_buffer_size, NwG, NwL))
+S_klm = np.zeros((block_size - overlap, NwG, NwL))
+S_ls_FT = np.zeros((lineshape_size, NwG, NwL))
+S_klm_ref = np.zeros((2*Nv, NwG, NwL))
 
-latest_line = np.zeros((NwG,NwL), dtype=int)
-cum_skip = np.zeros((NwG,NwL), dtype=int)
+last_line = np.zeros((NwG,NwL), dtype=int)
+skip_cum = np.zeros((NwG,NwL), dtype=int)   #cumulative skip in number of elements in the unbroadened array
+skip_idx = np.zeros((NwG,NwL), dtype=int) #index of the start ([:,:,0]) and width ([:,:,1]) in the broadened array
+skip_size = np.zeros((NwG,NwL), dtype=int) #index of the start ([:,:,0]) and width ([:,:,1]) in the broadened array
+output_arr = np.zeros(NwL, dtype=float)
 
 print(vi_arr[0], vi_arr[-1])
 print(spread_size, lineshape_size, block_size)
@@ -113,30 +117,49 @@ for il in range(len(v0_arr)):
         k = iv_old + k_diff_min
         iv_step = iv - iv_old
 
+        #The index kj is the index of the v-grid.
+        #Add the circular buffer to the block as much as needed
+        #to catch up with the change in iv.
         for j in range(np.min((iv_step, spread_size))):
             kj = k + j
             kj_c = kj & circ_mask
-            
+
+            #Iterate over the wG x wL grid; if value in the circular
+            #buffer is non-zero add it to the block memory.
+            #TO-DO: this should be a single function?
             for l in range(NwG):
                 for m in range(NwL):
-                    
                     val_klm = S_circ[kj_c, l, m]
                     if val_klm != 0.0:
 
-                        if kj - latest_line[l,m] > lineshape_size:
-                            cum_skip[l,m] += kj - latest_line[l,m] - lineshape_size
-                            print(l,m,'moved a line!')
-                            # TO-DO: update skip_index_arr
+                        #If the current line is too far from the last line, move it closer:
+                        if kj - last_line[l,m] > lineshape_size:
+                            skip_cum[l,m] += kj - latest_line[l,m] - lineshape_size
+                            print(l,m,'moved a line closer!')
+                        
+                        #If the position of the line is outside of the block,
+                        #apply convolution and add it to the output:
+                        kj_adj = kj - skip_cum[l,m]
+                        if kj_adj > block_size - overlap:
+                            S_klm_FT = rfft(S_klm[:,l,m])
+                            S_conv = irfft(S_klm_FT * ls_FT[:,l,m])
+
+                            #Add the convolved block to the output array:
+                            expanded_size = block_size + skip_cum[l,m] #+ lineshape_size//2
+                            skip = skip_idx[l,m][0]
+                            for i in range(expanded_size):
+                                if i ==
+                                output_arr[i + offset] = S_conv[i]
+                                
                             
-                        kj_adj = kj - cum_skip[l,m]
+                        #Continue adding the circular buffer to the block:
                         S_klm[kj_adj, l, m] = val_klm 
                         S_circ[kj_c, l, m] = 0.0
                         latest_line[l, m] = kj
 
         iv_old = iv
-        indices = []
         
-    #continue adding lines to circular buffer
+    #Continue adding lines to circular buffer
     S0i = S0_arr[il]
     vii = v0_arr[il] + p * da_arr[il]
     log_wGi = log_wG_arr[il]

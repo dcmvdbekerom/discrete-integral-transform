@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy import sinc, pi, exp, sin
+from numpy import sinc, pi, exp, sin, cos, sinh, cosh
 from numpy.fft import rfft, rfftfreq, fftshift, ifftshift
+from scipy.special import hyp2f1
 
 Nv = 100
 dv = 0.1
@@ -20,33 +21,61 @@ N = 2*Nv
 def myft(y_arr):
     return np.sum([y_arr[k]*exp(-2j*pi*k*n_arr/N) for k in k_arr],0)
 
-gL  = lambda v,v0,w: 2/(pi*w) * 1 / (1 + 4*((v-v0)/w)**2)
 
-def rect2(v,M):
-    res = np.zeros(N)
-    res[(N//2)-(M//2):(N//2)+(M//2)+(M&1)] = 1.0
-    return res
-    #return 0.5*(np.abs(v_arr/w) < 0.5) + 0.5*(np.abs(v_arr/w) <= 0.5)
+def hyper_sum(a,z,m):
+    return hyp2f1(a, 1, a + 1, z) - a*z**m/(m + a) * hyp2f1(m + a, 1, m + a + 1, z)
+    
+
+def direct_L_FT():
+
+    z = exp(-2j*pi*n_arr/N)
+    z[np.abs(z)==0] = 0.0
+    a = w/(2*dv)
+    
+    return 2/(pi*w) * np.sum(
+      [z**  k /(1 + (k/a)**2) for k in range(Nv)]
+    + [z**(-k)/(1 + (k/a)**2) for k in range(Nv)]
+    +[(-1)**n_arr/(1 + 4*(Nv*dv/w)**2) - 1]
+    ,0)
+
+
+def direct_L_FT2():
+
+    z = exp(-2j*pi*n_arr/N)
+    a = w/(2*dv)
+    
+    return 2/(pi*w) * (
+      0.5*(hyper_sum(1j*a,  z,Nv) + hyper_sum(-1j*a,  z,Nv))
+    + 0.5*(hyper_sum(1j*a,1/z,Nv) + hyper_sum(-1j*a,1/z,Nv))
+    +(-1)**n_arr/(1 + 4*(Nv*dv/w)**2) - 1
+    )
+
+gL  = lambda v,w: 2/(pi*w) * 1 / (1 + 4*(v/w)**2)
 
 
 w = 1.0
 M = 11
 
-y_arr = np.fft.fftshift(gL(v_arr,0.0,w))
-Y_rfft = rfft(y_arr2)*dv
-Y_exact = sinc(w*x_arr)
-Y_myft = myft(y_arr2)*dv
-##Y_rect = np.sum([exp(-2j*pi*k*n_arr/N) for k in np.arange(-(M//2),(M//2)+(M&1))],0) * dv
-##Y_rect = np.sum([exp(-2j*pi*(k - M//2)*n_arr/N) for k in np.arange(M)],0) * dv
-##Y_rect = (1-exp(-2j*pi*M*n_arr/N)) / (1-exp(-2j*pi*n_arr/N)) * exp(2j*pi*(M//2)*n_arr/N) * dv
-##Y_rect = sin(pi*M*n_arr/N)/sin(pi*n_arr/N) * dv
+y_arr = np.fft.fftshift(gL(v_arr,w))
+Y_rfft = rfft(y_arr)*dv
+Y_myft = myft(y_arr)*dv
+Y_lor = 2/(pi*w) * np.sum([
+    exp(-2j*pi*k*n_arr/N)/(1 + 4*(k*dv/w)**2)
+    for k in k_arr],0) * dv
+
+Y_lor2 = 2/(pi*w) * np.sum(
+    [2*cos(-2*pi*k*n_arr/N)/(1 + 4*(k*dv/w)**2) for k in range(Nv)]
+    +[(-1)**n_arr/(1 + 4*(Nv*dv/w)**2) - 1]
+    ,0) * dv
+
+Y_lor3 = direct_L_FT2() * dv
 
 fig, ax = plt.subplots(1,2, figsize=(14,6))
-ax[0].plot(np.fft.fftshift(k_arr), y_arr2,'k.')
+ax[0].plot(np.fft.fftshift(k_arr), y_arr,'k.')
 ax[1].plot(n_arr, Y_rfft.real,'b')
 ax[1].plot(n_arr, Y_rfft.imag,'r')
 ##ax[1].plot(n_arr, Y_myft.real, 'k--')
 ##ax[1].plot(n_arr, Y_myft.imag, 'k--')
-##ax[1].plot(n_arr, Y_rect.real, 'k--')
-##ax[1].plot(n_arr, Y_rect.imag, 'k--')
+ax[1].plot(n_arr, Y_lor3.real, 'k--')
+ax[1].plot(n_arr, Y_lor3.imag, 'k--')
 plt.show()
