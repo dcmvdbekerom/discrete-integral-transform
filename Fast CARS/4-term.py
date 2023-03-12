@@ -84,9 +84,10 @@ Ia = a0*I0 + a1*I1 + a2*I2 + a3*I3
 xdIdx    = x[2:-2]    * (Ie[3:-1] -   Ie[1:-3]                       )/(2*dx   )
 x2d2Idx2 = x[2:-2]**2 * (Ie[1:-3] - 2*Ie[2:-2] +   Ie[3:-1]          )/   dx**2
 x3d3Idx3 = x[2:-2]**3 * (Ie[4:  ] - 2*Ie[3:-1] + 2*Ie[1:-3] - Ie[:-4])/(2*dx**3)
+x4d4Idx4 = x[2:-2]**4 * (Ie[ :-4] - 4*Ie[1:-3] + 6*Ie[2:-2] - 4*Ie[3:-1] + Ie[4:])/dx**4
 
-Y3 = 1/3*Ie[2:-2] + 7/3*xdIdx + 2*x2d2Idx2 + 1/3*x3d3Idx3
-Ierr_est = t*(1-t**2)*Dx**3/2 * Y3
+Y4 = Ie[2:-2] + 15*xdIdx + 25*x2d2Idx2 + 10*x3d3Idx3 + x4d4Idx4
+Ierr_est = t*(1-t)*(1+t)*(t-2)*Dx**4/24 * Y4
 
 p_list = [ax1.plot(x,I,c='gray',lw=2)[0] for I in I_list]
 pe, = ax1.plot(x,Ie,'--',lw=2,c='k',label= 'Exact Lineshape',zorder = 30)
@@ -171,15 +172,13 @@ def update(val):
         
         I_list = [g(x*wi)*wi for wi in w_arr]
 
-        xdIdx    = x[2:-2]    * (Ie[3:-1] -   Ie[1:-3]                       )/(2*dx   )
-        x2d2Idx2 = x[2:-2]**2 * (Ie[1:-3] - 2*Ie[2:-2] +   Ie[3:-1]          )/   dx**2
-        x3d3Idx3 = x[2:-2]**3 * (Ie[4:  ] - 2*Ie[3:-1] + 2*Ie[1:-3] - Ie[:-4])/(2*dx**3)
+        xdIdx    = x[2:-2]    * (Ie[3:-1] -   Ie[1:-3]                                   )/(2*dx   )
+        x2d2Idx2 = x[2:-2]**2 * (Ie[1:-3] - 2*Ie[2:-2] +   Ie[3:-1]                      )/   dx**2
+        x3d3Idx3 = x[2:-2]**3 * (Ie[4:  ] - 2*Ie[3:-1] + 2*Ie[1:-3] -   Ie[ :-4]         )/(2*dx**3)
+        x4d4Idx4 = x[2:-2]**4 * (Ie[ :-4] - 4*Ie[1:-3] + 6*Ie[2:-2] - 4*Ie[3:-1] + Ie[4:])/   dx**4
 
-        Y3 = 1/3*Ie[2:-2] + 7/3*xdIdx + 2*x2d2Idx2 + 1/3*x3d3Idx3
-        Ierr_est = t*(1-t**2)*Dx**3/2 * Y3
-
-##        Y2 = Ie[1:-1] + 3*x[1:-1]*dIdx + x[1:-1]**2*d2Idx2
-##        Ierr_est = t2*(1-t2)*Dx**2/2 * Y2
+        Y4 = Ie[2:-2] + 15*xdIdx + 25*x2d2Idx2 + 10*x3d3Idx3 + x4d4Idx4
+        Ierr_est = (1+t)*t*(1-t)*(t-2)*Dx**4/24 * Y4
 
     Ia = a0*I0 + a1*I1 + a2*I2 + a3*I3
 
