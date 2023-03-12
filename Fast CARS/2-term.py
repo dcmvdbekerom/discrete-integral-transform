@@ -79,6 +79,8 @@ xdIdx = x[1:-1] * (Ie[2:] - Ie[:-2])/(2*dx)
 x2d2Idx2 = x[1:-1]**2 * (Ie[2:] - 2*Ie[1:-1] + Ie[:-2])/dx**2
 Y        = Ie[1:-1] + 3*xdIdx + x2d2Idx2
 Ierr_est = t*(1-t)*Dx**2/2 * Y
+print('Max Y2:', np.max(np.abs(Y))) #0.740
+
 
 p_list = [ax1.plot(x,I,c='gray',lw=2)[0] for I in I_list]
 pe, = ax1.plot(x,Ie,'--',lw=2,c='k',label= 'Exact Lineshape',zorder = 30)

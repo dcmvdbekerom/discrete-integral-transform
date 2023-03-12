@@ -88,6 +88,7 @@ x4d4Idx4 = x[2:-2]**4 * (Ie[ :-4] - 4*Ie[1:-3] + 6*Ie[2:-2] - 4*Ie[3:-1] + Ie[4:
 
 Y4 = Ie[2:-2] + 15*xdIdx + 25*x2d2Idx2 + 10*x3d3Idx3 + x4d4Idx4
 Ierr_est = t*(1-t)*(1+t)*(t-2)*Dx**4/24 * Y4
+print('Max Y4:', np.max(np.abs(Y4))) #1.876 
 
 p_list = [ax1.plot(x,I,c='gray',lw=2)[0] for I in I_list]
 pe, = ax1.plot(x,Ie,'--',lw=2,c='k',label= 'Exact Lineshape',zorder = 30)
