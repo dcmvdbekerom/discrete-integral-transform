@@ -51,7 +51,7 @@ cdict2 = {'red': clist,'green':clist,'blue':clist}
 cmap2 = LinearSegmentedColormap('cmap2',cdict2)
 
 g = gL
-Dx = 0.1
+Dx = np.log(2)
 kt = 2.49
 
 w = np.exp((kt-2)*Dx)
@@ -81,10 +81,10 @@ I_list = [g(x*wi)*wi for wi in w_arr]
 
 Ia = a0*I0 + a1*I1 + a2*I2 + a3*I3
 
-xdIdx    = x[2:-2]    * (Ie[3:-1] -   Ie[1:-3]                       )/(2*dx   )
-x2d2Idx2 = x[2:-2]**2 * (Ie[1:-3] - 2*Ie[2:-2] +   Ie[3:-1]          )/   dx**2
-x3d3Idx3 = x[2:-2]**3 * (Ie[4:  ] - 2*Ie[3:-1] + 2*Ie[1:-3] - Ie[:-4])/(2*dx**3)
-x4d4Idx4 = x[2:-2]**4 * (Ie[ :-4] - 4*Ie[1:-3] + 6*Ie[2:-2] - 4*Ie[3:-1] + Ie[4:])/dx**4
+xdIdx    = x[2:-2]    * (             -Ie[1:-3]              +   Ie[3:-1]          )/(2*dx   )
+x2d2Idx2 = x[2:-2]**2 * (              Ie[1:-3] - 2*Ie[2:-2] +   Ie[3:-1]          )/   dx**2
+x3d3Idx3 = x[2:-2]**3 * (-Ie[ :-4] + 2*Ie[1:-3]              - 2*Ie[3:-1] + Ie[4: ])/(2*dx**3)
+x4d4Idx4 = x[2:-2]**4 * ( Ie[ :-4] - 4*Ie[1:-3] + 6*Ie[2:-2] - 4*Ie[3:-1] + Ie[4: ])/   dx**4
 
 Y4 = Ie[2:-2] + 15*xdIdx + 25*x2d2Idx2 + 10*x3d3Idx3 + x4d4Idx4
 Ierr_est = t*(1-t)*(1+t)*(t-2)*Dx**4/24 * Y4
