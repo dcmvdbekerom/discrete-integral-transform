@@ -109,7 +109,7 @@ def cy_multiply_lineshape(np.ndarray[np.complex64_t, ndim=3] S_klm_FT,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)    
-def cy0_calc_matrix(np.ndarray[np.float32_t, ndim=3] S_klm,
+def cy0_calc_matrix_222(np.ndarray[np.float32_t, ndim=3] S_klm,
                     np.ndarray[np.float32_t, ndim=1] S0_arr,
                     np.ndarray[np.float32_t, ndim=1] v0_arr,
                     np.ndarray[np.float32_t, ndim=1] log_wG_arr,
@@ -154,8 +154,92 @@ def cy0_calc_matrix(np.ndarray[np.float32_t, ndim=3] S_klm,
         S_klm[k1, l1, m1] +=    av  *    awG  *    awL  * S0i
 
 
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)    
+def cy0_calc_matrix_333(np.ndarray[np.float32_t, ndim=3] S_klm,
+                          np.ndarray[np.float32_t, ndim=1] S0_arr,
+                          np.ndarray[np.float32_t, ndim=1] v0_arr,
+                          np.ndarray[np.float32_t, ndim=1] log_wG_arr,
+                          np.ndarray[np.float32_t, ndim=1] log_wL_arr,
+                          float v_min, float log_wG_min, float log_wL_min, 
+                          float dv, float dxG, float dxL):
+    
+    cdef float k,l,m, tv,tG,tL
+    cdef int k0,k1,k2,l0,l1,l2,m0,m1,m2,i
+    cdef float S0i, v0i, log_wGi, log_wLi
+    cdef int Nlines = <int> S0_arr.shape[0]
+    
+    for i in range(Nlines):
+    
+        S0i = S0_arr[i]
+        v0i = v0_arr[i]
+        log_wGi = log_wG_arr[i]
+        log_wLi = log_wL_arr[i]
+  
+        k = (v0i - v_min) / dv
+        k0 = <int>(k + 0.5)
+        k1 = k0 + 1
+        k2 = k0 + 2
+        tv = k - k0
+
+        l = (log_wGi - log_wG_min) / dxG
+        l0 = <int>(l + 0.5)
+        l1 = l0 + 1
+        l2 = l0 + 2
+        tG = l - l0
+
+        m = (log_wLi - log_wL_min) / dxL
+        m0 = <int>(m + 0.5)
+        m1 = m0 + 1
+        m2 = m0 + 2
+        tL = m - m0
+
+        
+        S_klm[k0, l0, m0] += 0.5*tv*(tv-1) * 0.5*tG*(tG-1) * 0.5*tL*(tL-1) * S0i
+        S_klm[k0, l0, m1] += 0.5*tv*(tv-1) * 0.5*tG*(tG-1) *     (1-tL**2) * S0i
+        S_klm[k0, l0, m2] += 0.5*tv*(tv-1) * 0.5*tG*(tG-1) * 0.5*tL*(tL+1) * S0i
+
+        S_klm[k0, l1, m0] += 0.5*tv*(tv-1) *     (1-tG**2) * 0.5*tL*(tL-1) * S0i
+        S_klm[k0, l1, m1] += 0.5*tv*(tv-1) *     (1-tG**2) *     (1-tL**2) * S0i
+        S_klm[k0, l1, m2] += 0.5*tv*(tv-1) *     (1-tG**2) * 0.5*tL*(tL+1) * S0i      
+        
+        S_klm[k0, l2, m0] += 0.5*tv*(tv-1) * 0.5*tG*(tG+1) * 0.5*tL*(tL-1) * S0i
+        S_klm[k0, l2, m1] += 0.5*tv*(tv-1) * 0.5*tG*(tG+1) *     (1-tL**2) * S0i
+        S_klm[k0, l2, m2] += 0.5*tv*(tv-1) * 0.5*tG*(tG+1) * 0.5*tL*(tL+1) * S0i
 
 
+        S_klm[k1, l0, m0] +=     (1-tG**2) * 0.5*tG*(tG-1) * 0.5*tL*(tL-1) * S0i
+        S_klm[k1, l0, m1] +=     (1-tG**2) * 0.5*tG*(tG-1) *     (1-tL**2) * S0i
+        S_klm[k1, l0, m2] +=     (1-tG**2) * 0.5*tG*(tG-1) * 0.5*tL*(tL+1) * S0i
+
+        S_klm[k1, l1, m0] +=     (1-tG**2) *     (1-tG**2) * 0.5*tL*(tL-1) * S0i
+        S_klm[k1, l1, m1] +=     (1-tG**2) *     (1-tG**2) *     (1-tL**2) * S0i
+        S_klm[k1, l1, m2] +=     (1-tG**2) *     (1-tG**2) * 0.5*tL*(tL+1) * S0i      
+        
+        S_klm[k1, l2, m0] +=     (1-tG**2) * 0.5*tG*(tG+1) * 0.5*tL*(tL-1) * S0i
+        S_klm[k1, l2, m1] +=     (1-tG**2) * 0.5*tG*(tG+1) *     (1-tL**2) * S0i
+        S_klm[k1, l2, m2] +=     (1-tG**2) * 0.5*tG*(tG+1) * 0.5*tL*(tL+1) * S0i        
+        
+        
+        S_klm[k2, l0, m0] += 0.5*tv*(tv+1) * 0.5*tG*(tG-1) * 0.5*tL*(tL-1) * S0i
+        S_klm[k2, l0, m1] += 0.5*tv*(tv+1) * 0.5*tG*(tG-1) *     (1-tL**2) * S0i
+        S_klm[k2, l0, m2] += 0.5*tv*(tv+1) * 0.5*tG*(tG-1) * 0.5*tL*(tL+1) * S0i
+
+        S_klm[k2, l1, m0] += 0.5*tv*(tv+1) *     (1-tG**2) * 0.5*tL*(tL-1) * S0i
+        S_klm[k2, l1, m1] += 0.5*tv*(tv+1) *     (1-tG**2) *     (1-tL**2) * S0i
+        S_klm[k2, l1, m2] += 0.5*tv*(tv+1) *     (1-tG**2) * 0.5*tL*(tL+1) * S0i      
+        
+        S_klm[k2, l2, m0] += 0.5*tv*(tv+1) * 0.5*tG*(tG+1) * 0.5*tL*(tL-1) * S0i
+        S_klm[k2, l2, m1] += 0.5*tv*(tv+1) * 0.5*tG*(tG+1) *     (1-tL**2) * S0i
+        S_klm[k2, l2, m2] += 0.5*tv*(tv+1) * 0.5*tG*(tG+1) * 0.5*tL*(tL+1) * S0i
+        
+        
+        
+        
+
+# Same as cy0, but calculates pressure broadening inside cython function.
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -258,13 +342,17 @@ def cy2_calc_matrix( np.ndarray[np.float32_t, ndim=3] S_klm,
                 #Iterate over the wG x wL grid; if value in the circular
                 #buffer is non-zero add it to the block memory.
                 #TO-DO: this should be compiled into a memcpy.
-                for l in range(NwG):
-                    for m in range(NwL):
-                        val_klm = S_circ[kj_c, l, m]
-                        if val_klm != 0.0:
-                            
-                            S_klm[kj, l, m] = val_klm 
-                            S_circ[kj_c, l, m] = 0.0
+                
+                S_klm[kj] = S_circ[kj_c]
+                S_circ[kj_c] = 0.0
+                
+                #for l in range(NwG):
+                #    for m in range(NwL):
+                #        val_klm = S_circ[kj_c, l, m]
+                #        if val_klm != 0.0:
+                #            
+                #            S_klm[kj, l, m] = val_klm 
+                #            S_circ[kj_c, l, m] = 0.0
 
             iv_old = iv
             
@@ -311,13 +399,16 @@ def cy2_calc_matrix( np.ndarray[np.float32_t, ndim=3] S_klm,
         #Iterate over the wG x wL grid; if value in the circular
         #buffer is non-zero add it to the block memory.
         #TO-DO: this should be compiled into a memcpy.
-        for l in range(NwG):
-            for m in range(NwL):
-                val_klm = S_circ[kj_c, l, m]
-                if val_klm != 0.0:
-                    
-                    S_klm[kj, l, m] = val_klm 
-                    S_circ[kj_c, l, m] = 0.0
+        S_klm[kj] = S_circ[kj_c]
+        S_circ[kj_c] = 0.0
+        
+        #for l in range(NwG):
+        #    for m in range(NwL):
+        #        val_klm = S_circ[kj_c, l, m]
+        #        if val_klm != 0.0:
+        #            
+        #            S_klm[kj, l, m] = val_klm 
+        #            S_circ[kj_c, l, m] = 0.0
 
 
 

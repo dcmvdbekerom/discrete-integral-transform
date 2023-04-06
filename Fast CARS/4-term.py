@@ -51,7 +51,7 @@ cdict2 = {'red': clist,'green':clist,'blue':clist}
 cmap2 = LinearSegmentedColormap('cmap2',cdict2)
 
 g = gL
-Dx = 0.1
+Dx = 0.5
 kt = 2.49
 
 w = np.exp((kt-2)*Dx)

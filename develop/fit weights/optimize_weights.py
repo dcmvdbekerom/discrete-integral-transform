@@ -5,7 +5,7 @@ init_printing(use_unicode=True)
 
 print('Weights:')
 
-Nbin = 4 # Number of bins
+Nbin = 5 # Number of bins
 n_min = -((Nbin - 1) // 2)
 n_max = n_min + Nbin - 1
 
