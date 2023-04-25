@@ -81,11 +81,11 @@ p_list = [ax1.plot(x,I,c='gray',lw=2)[0] for I in I_list]
 pe, = ax1.plot(x,Ie,'--',lw=2,c='k',label= 'Exact Lineshape',zorder = 30)
 pp, = ax1.plot(x,Ip,lw=4,c=colors[k+1],alpha = a,label='I[k+1]')
 pabg, = ax1.plot(x,Ia,lw=6,c='w',zorder = 10)
-pa, = ax1.plot(x,Ia,lw=4,c=cmap(kt/4),zorder = 20,label = 'Approximated Lineshape\n= {:.2f}$\\cdot$I[k] + {:.2f}$\\cdot$I[k+1]'.format(1-a,a))
+pa, = ax1.plot(x,Ia,lw=4,c=cmap(kt/4),zorder = 20,label = 'Approximated Lineshape\n= {:.2f}·I[k] + {:.2f}·I[k+1]'.format(1-a,a))
 pm, = ax1.plot(x,Im,lw=4,c=colors[k  ],alpha = 1-a,label='I[k]')
 
 
-p_err, = ax2.plot(x,Ia-Ie,lw = 4,c=cmap(kt/4),label='Approximation Error\n= I$_{approx.}$ - I$_{exact}$')
+p_err, = ax2.plot(x,Ia-Ie,lw = 4,c=cmap(kt/4),label='Approximation Error\n= approx. - exact')
 ##p_err_e, = ax2.plot(x,Ierr_est,'k--',lw = 2,zorder = 20,label='Estimated error')
 
 
