@@ -52,7 +52,7 @@ cmap2 = LinearSegmentedColormap('cmap2',cdict2)
 
 g = gG
 Dx = 0.1
-kt = 2.5
+kt = 2.0
 
 w = np.exp((kt-2)*Dx)
 k = int(kt)

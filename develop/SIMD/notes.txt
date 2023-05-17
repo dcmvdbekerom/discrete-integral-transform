@@ -1,0 +1,9 @@
+Notes:
+
+Matrix calculation:
+- py1 vs py2: Get indices by division of dx is a little faster (~10%) 
+- py2 vs cy1: Replacing add_at with cython version is MUCH faster, 1200ms vs 200ms.
+- cy1 vs cpp1: Cython add_at vs cpp version: no difference.
+- cy0 vs cpp2: Cyhton version a little faster (30 ms vs 35 ms)
+- cy0 vs cpp2+SIMD: cython version was a little faster (30ms vs 35 ms)
+For now: cy0 comes out ahead, SIMD tried at some point, but not included in this report.

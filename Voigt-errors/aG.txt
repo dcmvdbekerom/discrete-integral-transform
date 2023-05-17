@@ -1,0 +1,17 @@
+
+τG
+ 
+ +
+
+ 0.5*(  
+ + log_pG*          τG*(1 - τG)*(SG1L1*SG2L1 - SG1G2*SL1L1)
+ + log_pL**2/log_pG*τL*(1 - τL)*(SG1L1*SL1L2 - SG1L2*SL1L1)
+ )
+ 
+ /
+ 
+ (
+ +   SG1G1*SL1L1 - SG1L1**2
+ +   log_pL*(1 - 2*τL)*(SG1G1*SL1L2 - SG1L1*SG1L2) 
+ +   log_pG*(1 - 2*τG)*(SG1G2*SL1L1 - SG1L1*SG2L1)
+ )

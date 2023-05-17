@@ -47,10 +47,15 @@ for alpha,label in zip(alpha_arr,labels):
 
             av,aG,aL = vl.optimized_weights(tv,tG,tL,dxvG,dxG,dxL,alpha)
 
+            aaL = tL + tL*(tL-1)*dxL/4
+            aaG = tG + tG*(tG-1)*dxG/4
+
             axhv.plot([tG],[tL],'k+',fillstyle='full',markersize=markersize)
             axhv.plot([tG],[tL],'ks',fillstyle='none',markersize=markersize)
             axhv.plot([aG],[aL],'k.',fillstyle='full',markersize=markersize)
             axhv.plot([aG],[aL],'ko',fillstyle='none',markersize=markersize)
+            axhv.plot([aaG],[aaL],'k+',fillstyle='full',markersize=markersize)
+            axhv.plot([aaG],[aaL],'ko',fillstyle='none',markersize=markersize)
 
             # Generate grid:
             G_width = 0.5 * np.abs(aG - tG)

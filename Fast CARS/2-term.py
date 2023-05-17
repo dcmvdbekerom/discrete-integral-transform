@@ -51,7 +51,9 @@ cdict2 = {'red': clist,'green':clist,'blue':clist}
 cmap2 = LinearSegmentedColormap('cmap2',cdict2)
 
 g = gL
-Dx = np.log(2)
+
+Dx = 0.5
+
 kt = 2.5
 
 w = np.exp((kt-2)*Dx)
@@ -131,8 +133,12 @@ def update(val):
     k0 = int(kt)
     k1 = k0 + 1
     t = kt - k0
-    a0 = 1-t
-    a1 = t
+##    a0 = 1-t
+##    a1 = t
+
+    a1 = (np.exp(-t*Dx) - 1)/(np.exp(-Dx) - 1)
+    a0 = 1 - a1
+##    print(a1, t)
     
     if v0w == 'v0':
         x = np.arange(-(x_max//(2*Dx))*Dx,(x_max//(2*Dx))*Dx+Dx,Dx)
@@ -150,9 +156,9 @@ def update(val):
         w     = np.exp((kt-2)*Dx)
         w_arr = np.exp(np.arange(-2,3)*Dx)
 
-        Ie = g(x*w)*w
-        I0 = g(x*w_arr[k0])*w_arr[k0]
-        I1 = g(x*w_arr[min((k1,4))])*w_arr[min((k1,4))]
+        Ie = g(x*w)/w
+        I0 = g(x*w_arr[k0])/w_arr[k0]
+        I1 = g(x*w_arr[min((k1,4))])/w_arr[min((k1,4))]
         I_list = [g(x*wi)*wi for wi in w_arr]
 
         xdIdx = x[1:-1] * (Ie[2:] - Ie[:-2])/(2*dx)
@@ -178,12 +184,12 @@ def update(val):
 
     p0.set_xdata(x)
     p0.set_ydata(I0)
-    p0.set_alpha(a0)
+##    p0.set_alpha(a0)
     p0.set_c(colors[k0])
 
     p1.set_xdata(x)
     p1.set_ydata(I1)
-    p1.set_alpha(a1)
+##    p1.set_alpha(a1)
     p1.set_c(colors[min(k1,4)])
 
     p_err.set_xdata(x)

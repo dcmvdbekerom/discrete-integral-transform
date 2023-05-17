@@ -134,7 +134,7 @@ def update(event):
 
 def on_press(event):
     global snapped
-    if event.key == 'shift':
+    if event.button == 2:
         if event.xdata and event.ydata:
             k, l = event.xdata, event.ydata
             ki, li = int(k + 0.5), int(l + 0.5)
@@ -149,13 +149,14 @@ def on_press(event):
         
 def on_release(event):
     global snapped
-    if event.key == 'shift':
+    if event.button == 2:
         snapped = (-1, -1)
         psn.set_data((0,0), (0,0))
         update(event)
 
+
 fig.canvas.mpl_connect('motion_notify_event', update)
-fig.canvas.mpl_connect('key_press_event', on_press)
-fig.canvas.mpl_connect('key_release_event', on_release)
+fig.canvas.mpl_connect('button_press_event', on_press)
+fig.canvas.mpl_connect('button_release_event', on_release)
 
 plt.show()
